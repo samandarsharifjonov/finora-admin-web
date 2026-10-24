@@ -18,39 +18,55 @@ export interface AuthResponse {
 
 export interface AdminOverview {
   total_users: number
-  total_active_users: number
-  dau: number
-  mau: number
-  retention_rate_pct: number
-  total_balance: number
-  total_income: number
-  total_expense: number
-  total_transactions: number
-  total_receipts: number
-  total_accounts: number
-  total_categories: number
   new_users_today: number
+  new_users_this_week?: number
   new_users_this_month: number
-  ai_message_count: number
-  ai_transaction_count: number
+  active_users_today?: number
+  active_users_this_month?: number
+  total_transactions: number
+  transactions_today?: number
+  total_receipts_scanned?: number
+  receipts_scanned_today?: number
+  total_income_all_time?: number
+  total_expense_all_time?: number
+  total_income?: number
+  total_expense?: number
+  income_today?: number
+  expense_today?: number
+  income_this_month?: number
+  expense_this_month?: number
+  total_deleted_accounts?: number
+  // Convenient fields
+  dau?: number
+  mau?: number
+  retention_rate_pct?: number
+  total_balance?: number
+  total_receipts?: number
+  ai_message_count?: number
+  ai_transaction_count?: number
 }
 
 export interface AdminUserListItem {
-  id: number
+  id?: number
+  user_id?: number
   full_name: string
   email: string
   avatar_url?: string | null
   auth_provider: string
   is_blocked: boolean
   blocked_reason?: string | null
-  is_admin: boolean
-  is_super_admin: boolean
+  is_admin?: boolean
+  is_super_admin?: boolean
   is_protected?: boolean
-  balance: number
+  balance?: number
+  total_income?: number
+  total_expense?: number
   transaction_count: number
-  receipt_count: number
-  last_activity?: string | null
-  created_at: string
+  receipt_count?: number
+  device_count?: number
+  joined_at?: string
+  last_activity_at?: string | null
+  created_at?: string
 }
 
 export interface AdminUserListResponse {

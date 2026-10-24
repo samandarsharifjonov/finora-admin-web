@@ -60,16 +60,17 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestOpti
     headers,
   })
 
+  const resJson = await response.json().catch(() => null)
+
   // 401 Unauthorized handling
   if (response.status === 401) {
-    removeToken()
-    if (!window.location.pathname.includes('/login')) {
-      window.location.href = '/login'
+    if (endpoint.includes('/auth/login')) {
+      const errorMsg = resJson?.error || resJson?.message || "Email yoki parol noto'g'ri"
+      throw new Error(errorMsg)
     }
+    removeToken()
     throw new Error('Sessiya muddati tugadi, qaytadan tizimga kiring')
   }
-
-  const resJson = await response.json().catch(() => null)
 
   if (!response.ok) {
     const errorMsg = resJson?.error || resJson?.message || `Xatolik: ${response.status} ${response.statusText}`

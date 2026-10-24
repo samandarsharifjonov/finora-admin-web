@@ -192,115 +192,121 @@ export const UsersPage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                users.map(u => (
-                  <tr
-                    key={u.id}
-                    className="transition-colors hover:bg-slate-50/60 dark:hover:bg-dark-cardSecondary/50"
-                  >
-                    {/* User info */}
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-finora-100 font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-300">
-                          {u.full_name?.charAt(0) || u.email?.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <Link
-                              to={`/users/${u.id}`}
-                              className="font-bold text-slate-900 hover:text-finora-600 dark:text-white dark:hover:text-finora-400"
-                            >
-                              {u.full_name || 'Noma\'lum'}
-                            </Link>
-                            {u.is_super_admin && (
-                              <span className="rounded bg-amber-100 px-1 py-0.2 text-[9px] font-extrabold text-amber-800 dark:bg-amber-950 dark:text-amber-400">
-                                OWNER
-                              </span>
-                            )}
-                            {u.is_admin && !u.is_super_admin && (
-                              <span className="rounded bg-finora-100 px-1 py-0.2 text-[9px] font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-300">
-                                ADMIN
-                              </span>
-                            )}
-                            {u.is_protected && (
-                              <span title="Himoyalangan hisob">
-                                <Shield className="h-3.5 w-3.5 text-blue-500" />
-                              </span>
-                            )}
+                users.map(u => {
+                  const uid = u.user_id ?? u.id ?? 0
+                  const bal = u.balance ?? ((u.total_income || 0) - (u.total_expense || 0))
+                  const regDate = u.joined_at ?? u.created_at
+
+                  return (
+                    <tr
+                      key={uid}
+                      className="transition-colors hover:bg-slate-50/60 dark:hover:bg-dark-cardSecondary/50"
+                    >
+                      {/* User info */}
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-finora-100 font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-300">
+                            {u.full_name?.charAt(0) || u.email?.charAt(0).toUpperCase()}
                           </div>
-                          <div className="truncate text-[11px] text-slate-400">
-                            {u.email}
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <Link
+                                to={`/users/${uid}`}
+                                className="font-bold text-slate-900 hover:text-finora-600 dark:text-white dark:hover:text-finora-400"
+                              >
+                                {u.full_name || 'Noma\'lum'}
+                              </Link>
+                              {u.is_super_admin && (
+                                <span className="rounded bg-amber-100 px-1 py-0.2 text-[9px] font-extrabold text-amber-800 dark:bg-amber-950 dark:text-amber-400">
+                                  OWNER
+                                </span>
+                              )}
+                              {u.is_admin && !u.is_super_admin && (
+                                <span className="rounded bg-finora-100 px-1 py-0.2 text-[9px] font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-300">
+                                  ADMIN
+                                </span>
+                              )}
+                              {u.is_protected && (
+                                <span title="Himoyalangan hisob">
+                                  <Shield className="h-3.5 w-3.5 text-blue-500" />
+                                </span>
+                              )}
+                            </div>
+                            <div className="truncate text-[11px] text-slate-400">
+                              {u.email}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Balance */}
-                    <td className="px-5 py-3.5 font-bold text-slate-800 dark:text-slate-200">
-                      {formatCurrency(u.balance)}
-                    </td>
+                      {/* Balance */}
+                      <td className="px-5 py-3.5 font-bold text-slate-800 dark:text-slate-200">
+                        {formatCurrency(bal)}
+                      </td>
 
-                    {/* Transaction count */}
-                    <td className="px-5 py-3.5 text-center font-medium text-slate-600 dark:text-slate-400">
-                      {u.transaction_count} ta
-                    </td>
+                      {/* Transaction count */}
+                      <td className="px-5 py-3.5 text-center font-medium text-slate-600 dark:text-slate-400">
+                        {u.transaction_count} ta
+                      </td>
 
-                    {/* Receipt count */}
-                    <td className="px-5 py-3.5 text-center font-medium text-slate-600 dark:text-slate-400">
-                      {u.receipt_count} ta
-                    </td>
+                      {/* Receipt count */}
+                      <td className="px-5 py-3.5 text-center font-medium text-slate-600 dark:text-slate-400">
+                        {u.receipt_count || 0} ta
+                      </td>
 
-                    {/* Registered Date */}
-                    <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-[11px]">
-                      {formatDate(u.created_at)}
-                    </td>
+                      {/* Registered Date */}
+                      <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 text-[11px]">
+                        {formatDate(regDate)}
+                      </td>
 
-                    {/* Status */}
-                    <td className="px-5 py-3.5">
-                      {u.is_blocked ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
-                          <Ban className="h-3 w-3" /> Bloklangan
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
-                          <CheckCircle className="h-3 w-3" /> Faol
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Link
-                          to={`/users/${u.id}`}
-                          title="Profil tafsilotlarini ko'rish"
-                          className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition-colors hover:bg-slate-100 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300 dark:hover:bg-slate-800"
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
-
-                        {!u.is_super_admin && (
-                          u.is_blocked ? (
-                            <button
-                              onClick={() => handleUnblockUser(u)}
-                              title="Blokdan chiqarish"
-                              className="rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-600 hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400"
-                            >
-                              <Unlock className="h-3.5 w-3.5" />
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => setBlockingUser(u)}
-                              title="Akkauntni bloklash"
-                              className="rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-600 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-400"
-                            >
-                              <Lock className="h-3.5 w-3.5" />
-                            </button>
-                          )
+                      {/* Status */}
+                      <td className="px-5 py-3.5">
+                        {u.is_blocked ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
+                            <Ban className="h-3 w-3" /> Bloklangan
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
+                            <CheckCircle className="h-3 w-3" /> Faol
+                          </span>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-5 py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Link
+                            to={`/users/${uid}`}
+                            title="Profil tafsilotlarini ko'rish"
+                            className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition-colors hover:bg-slate-100 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300 dark:hover:bg-slate-800"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </Link>
+
+                          {!u.is_super_admin && (
+                            u.is_blocked ? (
+                              <button
+                                onClick={() => handleUnblockUser(u)}
+                                title="Blokdan chiqarish"
+                                className="rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-600 hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400"
+                              >
+                                <Unlock className="h-3.5 w-3.5" />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setBlockingUser(u)}
+                                title="Akkauntni bloklash"
+                                className="rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-600 hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-400"
+                              >
+                                <Lock className="h-3.5 w-3.5" />
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
