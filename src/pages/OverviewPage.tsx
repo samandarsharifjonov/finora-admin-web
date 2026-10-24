@@ -16,6 +16,7 @@ import {
 import { apiRequest } from '../lib/api'
 import type { AdminOverview } from '../types'
 import { formatCompactCurrency } from '../lib/utils'
+import { OverviewFlowChart } from '../components/common/SimpleCharts'
 
 export const OverviewPage: React.FC = () => {
   const [data, setData] = useState<AdminOverview | null>(null)
@@ -210,11 +211,20 @@ export const OverviewPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Visual Analytics Charts */}
+            <OverviewFlowChart
+              totalIncome={totalInc}
+              totalExpense={totalExp}
+              dau={dau}
+              mau={mau}
+              totalTx={totalTx}
+            />
+
             {/* Finora AI & Social Matrix Section */}
-            <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-finora-50/40 p-6 shadow-sm dark:border-dark-border dark:bg-gradient-to-br dark:from-dark-card dark:via-dark-card dark:to-finora-950/10">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-dark-border">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-finora-600 to-indigo-500 text-white shadow-md shadow-finora-500/20">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-finora-500/15 text-finora-700 dark:text-finora-400">
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div>
@@ -226,7 +236,7 @@ export const OverviewPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full bg-finora-100 px-3 py-1 text-xs font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-400">
+                <span className="rounded-full bg-finora-500/10 px-3 py-1 text-xs font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-400 border border-finora-500/20">
                   Aktiv
                 </span>
               </div>

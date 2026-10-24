@@ -16,6 +16,7 @@ import {
 import { apiRequest } from '../lib/api'
 import type { AdminUserListItem, AdminUserListResponse } from '../types'
 import { formatCurrency, formatDate } from '../lib/utils'
+import { UserAvatar } from '../components/common/UserAvatar'
 
 export const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<AdminUserListItem[]>([])
@@ -205,9 +206,12 @@ export const UsersPage: React.FC = () => {
                       {/* User info */}
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-finora-100 font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-300">
-                            {u.full_name?.charAt(0) || u.email?.charAt(0).toUpperCase()}
-                          </div>
+                          <UserAvatar
+                            src={u.avatar_url}
+                            name={u.full_name}
+                            email={u.email}
+                            size="md"
+                          />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">
                               <Link

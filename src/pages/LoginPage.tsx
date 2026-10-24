@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, Eye, EyeOff, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export const LoginPage: React.FC = () => {
@@ -29,21 +29,21 @@ export const LoginPage: React.FC = () => {
     }
   }
 
-  return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 p-4 dark:bg-dark-bg sm:p-6">
-      {/* Background radial glows */}
-      <div className="pointer-events-none absolute -top-40 -left-40 h-96 w-96 rounded-full bg-finora-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl" />
+  const logoUrl = `${import.meta.env.BASE_URL}logo.png`
 
+  return (
+    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-dark-bg sm:p-6">
       <div className="relative w-full max-w-md">
         {/* Card */}
-        <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-8 shadow-2xl backdrop-blur-xl dark:border-dark-border dark:bg-dark-card/90 sm:p-10">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-dark-border dark:bg-dark-card sm:p-10">
           {/* Logo & Header */}
           <div className="text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-finora-500 shadow-xl shadow-finora-500/25 text-slate-950">
-              <Sparkles className="h-7 w-7 text-slate-950" />
-            </div>
-            <h1 className="mt-5 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <img
+              src={logoUrl}
+              alt="Finora"
+              className="mx-auto h-14 w-14 rounded-2xl object-cover border border-slate-200 dark:border-dark-border"
+            />
+            <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Finora Admin Hub
             </h1>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">

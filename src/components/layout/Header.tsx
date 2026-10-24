@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { UserAvatar } from '../common/UserAvatar'
 import { getBaseApiUrl, setBaseApiUrl } from '../../lib/api'
 
 interface HeaderProps {
@@ -78,12 +79,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
           </button>
 
           {/* User profile & Logout */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-dark-border">
+          <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-dark-border">
+            <UserAvatar
+              src={user?.avatar_url}
+              name={user?.full_name}
+              email={user?.email}
+              size="sm"
+            />
             <div className="hidden text-right sm:block">
               <div className="text-xs font-semibold text-slate-900 dark:text-white">
                 {user?.full_name || 'Admin'}
               </div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400">
+              <div className="text-[10px] text-slate-400">
                 {user?.email}
               </div>
             </div>

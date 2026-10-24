@@ -19,10 +19,13 @@ import {
   Unlock,
   Trash2,
   AlertTriangle,
+  BarChart3,
 } from 'lucide-react'
 import { apiRequest } from '../lib/api'
 import type { AdminUserDetail } from '../types'
 import { formatCurrency, formatDate } from '../lib/utils'
+import { UserAvatar } from '../components/common/UserAvatar'
+import { MonthlyDynamicsChart } from '../components/common/SimpleCharts'
 
 export const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -158,12 +161,15 @@ export const UserDetailPage: React.FC = () => {
       </div>
 
       {/* User Header Profile Card */}
-      <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card sm:p-8">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card sm:p-7">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-finora-600 to-indigo-500 font-extrabold text-2xl text-white shadow-lg shadow-finora-500/25">
-              {user.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
-            </div>
+            <UserAvatar
+              src={user.avatar_url}
+              name={user.full_name}
+              email={user.email}
+              size="xl"
+            />
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl font-extrabold text-slate-900 dark:text-white sm:text-2xl">
@@ -347,10 +353,37 @@ export const UserDetailPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Monthly Financial Dynamics Chart */}
+      {user.monthly_dynamics && user.monthly_dynamics.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-dark-border mb-4">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-finora-600 dark:text-finora-400" />
+              <h2 className="font-bold text-sm text-slate-900 dark:text-white">
+                Oylik Moliyaviy Dinamika (Grafik tahlil)
+              </h2>
+            </div>
+            <span className="text-[11px] text-slate-400 font-medium">
+              Oxirgi {user.monthly_dynamics.length} oy ko'rsatkichlari
+            </span>
+          </div>
+
+          <MonthlyDynamicsChart
+            data={user.monthly_dynamics.map((m: any) => ({
+              label: m.month_name || `${m.month}-oy`,
+              income: m.income || 0,
+              expense: m.expense || 0,
+              txCount: m.transaction_count,
+            }))}
+            height={220}
+          />
+        </div>
+      )}
+
       {/* Connected Devices & Recent Transactions Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Connected Devices */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center gap-2 border-b border-slate-100 pb-3 dark:border-dark-border">
             <Smartphone className="h-4 w-4 text-slate-500" />
             <h2 className="font-bold text-sm text-slate-900 dark:text-white">
@@ -358,7 +391,7 @@ export const UserDetailPage: React.FC = () => {
             </h2>
           </div>
 
-          <div className="mt-3 divide-y divide-slate-100 dark:divide-dark-border/60">
+          <div className="mt-3 divide-y divide-slate-100 dark:divide-dark-border/60 max-h-[460px] overflow-y-auto pr-1">
             {(!user.devices || user.devices.length === 0) ? (
               <p className="py-6 text-center text-xs text-slate-400">
                 Qurilmalar ma'lumoti mavjud emas
@@ -385,16 +418,21 @@ export const UserDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Recent Transactions */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 dark:border-dark-border">
-            <Calendar className="h-4 w-4 text-slate-500" />
-            <h2 className="font-bold text-sm text-slate-900 dark:text-white">
-              Oxirgi Tranzaksiyalar ({user.recent_transactions?.length || 0})
-            </h2>
+        {/* Recent Transactions (Up to 30) */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-dark-border">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-slate-500" />
+              <h2 className="font-bold text-sm text-slate-900 dark:text-white">
+                Oxirgi Tranzaksiyalar ({user.recent_transactions?.length || 0} ta)
+              </h2>
+            </div>
+            <span className="rounded-md bg-slate-100 dark:bg-dark-cardSecondary px-2 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+              Oxirgi 30 tagacha
+            </span>
           </div>
 
-          <div className="mt-3 divide-y divide-slate-100 dark:divide-dark-border/60">
+          <div className="mt-3 divide-y divide-slate-100 dark:divide-dark-border/60 max-h-[460px] overflow-y-auto pr-1">
             {(!user.recent_transactions || user.recent_transactions.length === 0) ? (
               <p className="py-6 text-center text-xs text-slate-400">
                 Tranzaksiyalar mavjud emas

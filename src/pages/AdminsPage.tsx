@@ -5,9 +5,13 @@ import {
   Edit2,
   Search,
   RefreshCw,
+  Crown,
+  ShieldCheck,
 } from 'lucide-react'
 import { apiRequest } from '../lib/api'
 import type { AdminUserWithPerms, PermissionMeta } from '../types'
+import { UserAvatar } from '../components/common/UserAvatar'
+import { getPermissionInfo } from '../lib/permissions'
 
 export const AdminsPage: React.FC = () => {
   const [admins, setAdmins] = useState<AdminUserWithPerms[]>([])
@@ -183,9 +187,12 @@ export const AdminsPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-finora-500/15 font-bold text-finora-700 dark:bg-finora-950/60 dark:text-finora-400">
-                      {admin.full_name?.charAt(0) || admin.email?.charAt(0).toUpperCase()}
-                    </div>
+                    <UserAvatar
+                      src={admin.avatar_url}
+                      name={admin.full_name}
+                      email={admin.email}
+                      size="md"
+                    />
                     <div>
                       <h3 className="font-bold text-xs text-slate-900 dark:text-white">
                         {admin.full_name || 'Noma\'lum'}
@@ -196,29 +203,47 @@ export const AdminsPage: React.FC = () => {
                     </div>
                   </div>
                   {admin.is_super_admin && (
-                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-black text-amber-800 dark:bg-amber-950 dark:text-amber-400">
-                      OWNER
+                    <span className="flex items-center gap-1 rounded-md bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                      <Crown className="h-3 w-3" /> OWNER
                     </span>
                   )}
                 </div>
 
                 <div className="mt-4">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Ruxsatlar ({admin.is_super_admin ? 'Barcha ruxsatlar' : `${admin.permissions?.length || 0} ta`}):
-                  </span>
-                  <div className="mt-2 flex flex-wrap gap-1">
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <span>Biriktirilgan Huquqlar:</span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {admin.is_super_admin ? 'Cheksiz' : `${admin.permissions?.length || 0} ta`}
+                    </span>
+                  </div>
+
+                  <div className="mt-2.5">
                     {admin.is_super_admin ? (
-                      <span className="rounded-lg bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/50">
-                        To'liq tizim ruxsati (Barcha amallar)
-                      </span>
-                    ) : (admin.permissions || []).map(p => (
-                      <span
-                        key={p}
-                        className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700 dark:bg-dark-cardSecondary dark:text-slate-300"
-                      >
-                        {p}
-                      </span>
-                    ))}
+                      <div className="flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                        <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                        <span>Barcha tizim ruxsatlari (To'liq huquq)</span>
+                      </div>
+                    ) : admin.permissions && admin.permissions.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {admin.permissions.map(code => {
+                          const info = getPermissionInfo(code)
+                          return (
+                            <span
+                              key={code}
+                              title={`${info.label} (${code})`}
+                              className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-0.5 text-[11px] font-medium ${info.color}`}
+                            >
+                              <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
+                              <span>{info.shortLabel}</span>
+                            </span>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-dashed border-slate-200 dark:border-dark-border p-2 text-center text-[11px] text-slate-400">
+                        Hech qanday ruxsat berilmagan
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -258,13 +283,14 @@ export const AdminsPage: React.FC = () => {
             <div className="mt-4 max-h-72 overflow-y-auto space-y-2 pr-1">
               {permissionsMeta.map(meta => {
                 const checked = selectedPerms.includes(meta.code)
+                const info = getPermissionInfo(meta.code)
                 return (
                   <label
                     key={meta.code}
                     onClick={() => togglePermission(meta.code)}
                     className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
                       checked
-                        ? 'border-finora-500/50 bg-finora-50/50 dark:border-finora-500/40 dark:bg-finora-950/20'
+                        ? 'border-finora-500/50 bg-finora-500/10 dark:border-finora-500/40 dark:bg-finora-950/20'
                         : 'border-slate-200 bg-white hover:bg-slate-50 dark:border-dark-border dark:bg-dark-cardSecondary dark:hover:bg-slate-800'
                     }`}
                   >
@@ -272,13 +298,18 @@ export const AdminsPage: React.FC = () => {
                       type="checkbox"
                       checked={checked}
                       onChange={() => {}}
-                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-finora-600"
+                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-finora-600 focus:ring-finora-500"
                     />
-                    <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">
-                        {meta.name} <span className="text-[10px] font-normal text-slate-400">({meta.code})</span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">
+                          {meta.name || info.label}
+                        </div>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${info.color}`}>
+                          {info.shortLabel}
+                        </span>
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                         {meta.description}
                       </div>
                     </div>
@@ -339,12 +370,20 @@ export const AdminsPage: React.FC = () => {
                 </div>
               ) : (
                 candidates.map(c => (
-                  <div key={c.id} className="flex items-center justify-between py-2.5">
-                    <div>
-                      <div className="font-bold text-xs text-slate-900 dark:text-white">
-                        {c.full_name || 'Noma\'lum'}
+                  <div key={c.id || c.user_id} className="flex items-center justify-between py-2.5">
+                    <div className="flex items-center gap-3">
+                      <UserAvatar
+                        src={c.avatar_url}
+                        name={c.full_name}
+                        email={c.email}
+                        size="sm"
+                      />
+                      <div>
+                        <div className="font-bold text-xs text-slate-900 dark:text-white">
+                          {c.full_name || 'Noma\'lum'}
+                        </div>
+                        <div className="text-[11px] text-slate-400">{c.email}</div>
                       </div>
-                      <div className="text-[11px] text-slate-400">{c.email}</div>
                     </div>
                     <button
                       onClick={() => handleAssignAdmin(c)}
