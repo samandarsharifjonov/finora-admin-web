@@ -210,31 +210,31 @@ export const UserDetailPage: React.FC = () => {
 
           {/* Action buttons */}
           {!user.is_super_admin && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               {user.is_blocked ? (
                 <button
                   disabled={actionLoading}
                   onClick={handleUnblockUser}
-                  className="flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 transition-colors"
                 >
-                  <Unlock className="h-3.5 w-3.5" /> Blokdan chiqarish
+                  <Unlock className="h-3 w-3" /> Blokdan chiqarish
                 </button>
               ) : (
                 <button
                   disabled={actionLoading}
                   onClick={() => setShowBlockModal(true)}
-                  className="flex items-center gap-1.5 rounded-xl border border-rose-300 bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300"
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300 dark:hover:border-rose-900/60 dark:hover:bg-rose-950/30 dark:hover:text-rose-400 transition-colors"
                 >
-                  <Lock className="h-3.5 w-3.5" /> Bloklash
+                  <Lock className="h-3 w-3" /> Bloklash
                 </button>
               )}
 
               <button
                 disabled={actionLoading}
                 onClick={handleDeleteUser}
-                className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-white px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:border-rose-900/60 dark:bg-dark-cardSecondary dark:text-rose-400 dark:hover:bg-rose-950/40"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-400 dark:hover:border-rose-900/60 dark:hover:bg-rose-950/30 dark:hover:text-rose-400 transition-colors"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Akkauntni o'chirish
+                <Trash2 className="h-3 w-3" /> O'chirish
               </button>
             </div>
           )}
@@ -464,40 +464,40 @@ export const UserDetailPage: React.FC = () => {
 
       {/* Block User Modal */}
       {showBlockModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-dark-border dark:bg-dark-card">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-dark-border dark:bg-dark-card">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
-                <AlertTriangle className="h-5 w-5" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
+                <AlertTriangle className="h-4 w-4" />
               </div>
-              <div>
-                <h3 className="font-bold text-base text-slate-900 dark:text-white">
-                  Foydalanuvchini bloklash
+              <div className="min-w-0">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                  Bloklash
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                   {user.full_name || user.email}
                 </p>
               </div>
             </div>
 
-            <div className="mt-4">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                Bloklash sababi (foydalanuvchiga ko'rinadi)
+            <div className="mt-3.5">
+              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                Sabab:
               </label>
               <textarea
                 value={blockReason}
                 onChange={e => setBlockReason(e.target.value)}
-                placeholder="Masalan: Tizim qoidalarini buzganlik sababli..."
-                rows={3}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white p-3 text-xs text-slate-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                placeholder="Bloklash sababi..."
+                rows={2}
+                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-2.5 text-xs text-slate-900 outline-none focus:border-rose-500 focus:bg-white focus:ring-2 focus:ring-rose-500/20 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white resize-none"
               />
             </div>
 
-            <div className="mt-6 flex justify-end gap-2">
+            <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowBlockModal(false)}
-                className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:border-dark-border dark:text-slate-300 dark:hover:bg-slate-800"
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:border-dark-border dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Bekor qilish
               </button>
@@ -505,9 +505,9 @@ export const UserDetailPage: React.FC = () => {
                 type="button"
                 disabled={actionLoading}
                 onClick={handleBlockUser}
-                className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-rose-600/30 hover:bg-rose-700 disabled:opacity-50"
+                className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
               >
-                {actionLoading ? 'Bloklanmoqda...' : 'Bloklash'}
+                {actionLoading ? 'Saqlanmoqda...' : 'Bloklash'}
               </button>
             </div>
           </div>

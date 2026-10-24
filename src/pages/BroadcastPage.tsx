@@ -156,32 +156,32 @@ export const BroadcastPage: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleSendBroadcast} className="mt-4 space-y-4">
+            <form onSubmit={handleSendBroadcast} className="mt-4 space-y-3.5">
               <div>
                 <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Sarlavha (Title) *
+                  Mavzu *
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  placeholder="Masalan: Yangi imkoniyatlar qo'shildi! 🎉"
+                  placeholder="Mavzu"
                   required
-                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-2 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Xabar matni (Body) *
+                  Xabar *
                 </label>
                 <textarea
                   value={body}
                   onChange={e => setBody(e.target.value)}
-                  placeholder="Foydalanuvchilarga yetkazilishi kerak bo'lgan xabar..."
-                  rows={4}
+                  placeholder="Xabar"
+                  rows={3}
                   required
-                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-3 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-3 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-2 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white resize-none"
                 />
               </div>
 
@@ -189,42 +189,42 @@ export const BroadcastPage: React.FC = () => {
                 <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Rasm havolasi (ixtiyoriy)
                 </label>
-                <div className="relative mt-1.5">
-                  <ImageIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <div className="relative mt-1">
+                  <ImageIcon className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                   <input
                     type="url"
                     value={imageUrl}
                     onChange={e => setImageUrl(e.target.value)}
-                    placeholder="https://.../banner.png"
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-3.5 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                    placeholder="https://... (ixtiyoriy)"
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2 pl-9 pr-3 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-2 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Rejalashtirilgan vaqt (ixtiyoriy)
+                  Vaqt (ixtiyoriy)
                 </label>
-                <div className="relative mt-1.5">
-                  <Calendar className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <div className="relative mt-1">
+                  <Calendar className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                   <input
                     type="datetime-local"
                     value={scheduledAt}
                     onChange={e => setScheduledAt(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-3.5 text-xs text-slate-900 outline-none transition-all focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2 pl-9 pr-3 text-xs text-slate-900 outline-none transition-all focus:border-finora-500 focus:bg-white focus:ring-2 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
                   />
                 </div>
                 <p className="mt-1 text-[10.5px] text-slate-400">
-                  Agar bo'sh qoldirilsa, xabar darhol barchaga yuboriladi
+                  Bo'sh qoldirilsa, darhol barchaga yuboriladi
                 </p>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-md shadow-finora-500/25 transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-finora-500 py-2.5 text-xs font-bold text-slate-950 shadow-sm transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-60"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-3.5 w-3.5" />
                 <span>{isSubmitting ? 'Yuborilmoqda...' : scheduledAt ? 'Rejalashtirish' : 'Barchaga yuborish'}</span>
               </button>
             </form>
