@@ -31,7 +31,7 @@ export const AdminsPage: React.FC = () => {
     setError(null)
     try {
       const [adminsRes, metaRes] = await Promise.all([
-        apiRequest<AdminUserWithPerms[]>('/admin/admins/'),
+        apiRequest<AdminUserWithPerms[]>('/admin/admins'),
         apiRequest<PermissionMeta[]>('/admin/permissions'),
       ])
       setAdmins(adminsRes || [])
@@ -62,9 +62,10 @@ export const AdminsPage: React.FC = () => {
 
   const handleSavePermissions = async () => {
     if (!editingAdmin) return
+    const adminId = editingAdmin.user_id ?? editingAdmin.id
     setActionLoading(true)
     try {
-      await apiRequest(`/admin/admins/${editingAdmin.id}/permissions`, {
+      await apiRequest(`/admin/admins/${adminId}/permissions`, {
         method: 'PUT',
         body: JSON.stringify({ permissions: selectedPerms }),
       })
@@ -79,9 +80,10 @@ export const AdminsPage: React.FC = () => {
 
   const handleRevokeAdmin = async (admin: AdminUserWithPerms) => {
     if (!confirm(`${admin.full_name || admin.email} adminlik huquqini bekor qilmoqchimisiz?`)) return
+    const adminId = admin.user_id ?? admin.id
     setActionLoading(true)
     try {
-      await apiRequest(`/admin/admins/${admin.id}/revoke`, { method: 'DELETE' })
+      await apiRequest(`/admin/admins/${adminId}/revoke`, { method: 'DELETE' })
       fetchAdminsAndMeta()
     } catch (err: any) {
       alert(err?.message || "Bekor qilishda xatolik")
@@ -108,10 +110,11 @@ export const AdminsPage: React.FC = () => {
   }
 
   const handleAssignAdmin = async (candidate: any) => {
+    const candidateId = candidate.user_id ?? candidate.id
     setActionLoading(true)
     try {
       // Default view permissions
-      await apiRequest(`/admin/admins/${candidate.id}/permissions`, {
+      await apiRequest(`/admin/admins/${candidateId}/permissions`, {
         method: 'PUT',
         body: JSON.stringify({ permissions: ['overview.view', 'users.view'] }),
       })
@@ -148,7 +151,7 @@ export const AdminsPage: React.FC = () => {
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-finora-600 px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-finora-600/30 transition-colors hover:bg-finora-700"
+            className="flex items-center gap-1.5 rounded-xl bg-finora-500 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-md shadow-finora-500/25 transition-colors hover:bg-finora-600"
           >
             <UserPlus className="h-3.5 w-3.5" /> Yangi Admin Tayinlash
           </button>
@@ -174,13 +177,13 @@ export const AdminsPage: React.FC = () => {
         ) : (
           admins.map(admin => (
             <div
-              key={admin.id}
+              key={admin.user_id ?? admin.id ?? admin.email}
               className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-finora-100 font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-300">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-finora-500/15 font-bold text-finora-700 dark:bg-finora-950/60 dark:text-finora-400">
                       {admin.full_name?.charAt(0) || admin.email?.charAt(0).toUpperCase()}
                     </div>
                     <div>

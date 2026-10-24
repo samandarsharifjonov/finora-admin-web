@@ -78,15 +78,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Brand header */}
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6 dark:border-dark-border">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-finora-600 to-indigo-500 shadow-md shadow-finora-500/20">
-              <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-finora-500 shadow-md shadow-finora-500/25 text-slate-950 font-black">
+              <Sparkles className="h-5 w-5 text-slate-950" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
                   Finora
                 </span>
-                <span className="rounded-md bg-finora-100 px-1.5 py-0.5 text-[10px] font-bold text-finora-700 dark:bg-finora-950/60 dark:text-finora-400 border border-finora-200 dark:border-finora-800">
+                <span className="rounded-md bg-finora-500/15 px-1.5 py-0.5 text-[10px] font-black text-finora-700 dark:text-finora-400 border border-finora-500/30">
                   ADMIN
                 </span>
               </div>
@@ -120,7 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   cn(
                     'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-150',
                     isActive
-                      ? 'bg-finora-600 text-white shadow-md shadow-finora-600/25'
+                      ? 'bg-finora-500 text-slate-950 font-bold shadow-md shadow-finora-500/25'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-dark-cardSecondary dark:hover:text-slate-200'
                   )
                 }
@@ -136,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {user && (
           <div className="border-t border-slate-200 p-4 dark:border-dark-border">
             <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-2.5 dark:bg-dark-cardSecondary border border-slate-200/60 dark:border-dark-border/60">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-finora-100 text-finora-700 dark:bg-finora-950/80 dark:text-finora-300 font-bold text-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-finora-500/15 text-finora-700 dark:text-finora-400 font-bold text-sm">
                 {user.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">

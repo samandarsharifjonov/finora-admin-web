@@ -32,8 +32,9 @@ export const BroadcastPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await apiRequest<BroadcastNotification[]>('/admin/notifications/broadcast')
-      setBroadcasts(res || [])
+      const res = await apiRequest<any>('/admin/notifications/broadcast')
+      const items = Array.isArray(res) ? res : res?.items || []
+      setBroadcasts(items)
     } catch (err: any) {
       setError(err?.message || "Xabarnomalarni yuklashda xatolik")
     } finally {
@@ -74,6 +75,16 @@ export const BroadcastPage: React.FC = () => {
       setError(err?.message || "Xabarnoma yuborishda xatolik yuz berdi")
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleClearHistory = async () => {
+    if (!confirm("Barcha xabarnomalar tarixini tozalashni tasdiqlaysizmi?")) return
+    try {
+      await apiRequest('/admin/notifications/broadcast', { method: 'DELETE' })
+      setBroadcasts([])
+    } catch (err: any) {
+      alert(err?.message || "Tarixni tozalashda xatolik")
     }
   }
 
@@ -211,7 +222,7 @@ export const BroadcastPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-finora-600 py-3 text-xs font-bold text-white shadow-md shadow-finora-600/30 transition-all hover:bg-finora-700 active:scale-[0.99] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-md shadow-finora-500/25 transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-60"
               >
                 <Send className="h-4 w-4" />
                 <span>{isSubmitting ? 'Yuborilmoqda...' : scheduledAt ? 'Rejalashtirish' : 'Barchaga yuborish'}</span>
@@ -230,6 +241,14 @@ export const BroadcastPage: React.FC = () => {
                   Yuborilgan Xabarnomalar Tarixi ({broadcasts.length})
                 </h2>
               </div>
+              {broadcasts.length > 0 && (
+                <button
+                  onClick={handleClearHistory}
+                  className="flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-600 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-400"
+                >
+                  <Trash2 className="h-3 w-3" /> Tarixni tozalash
+                </button>
+              )}
             </div>
 
             <div className="mt-4 divide-y divide-slate-100 dark:divide-dark-border/60">
@@ -270,7 +289,7 @@ export const BroadcastPage: React.FC = () => {
                             <Clock className="h-3 w-3" />
                             {formatDate(b.sent_at || b.scheduled_at || b.created_at)}
                           </span>
-                          <span>Qabul qiluvchilar: {b.recipient_count || 'Barchasi'}</span>
+                          <span>Qabul qiluvchilar: {b.sent_count ?? b.recipient_count ?? 'Barchasi'} ta</span>
                         </div>
                       </div>
 

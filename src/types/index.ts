@@ -117,7 +117,8 @@ export interface AdminUserTransaction {
 }
 
 export interface AdminUserDetail {
-  id: number
+  id?: number
+  user_id?: number
   full_name: string
   email: string
   avatar_url?: string | null
@@ -125,49 +126,96 @@ export interface AdminUserDetail {
   is_blocked: boolean
   blocked_reason?: string | null
   blocked_at?: string | null
-  is_admin: boolean
-  is_super_admin: boolean
+  is_admin?: boolean
+  is_super_admin?: boolean
   is_protected?: boolean
-  balance: number
-  total_income: number
-  total_expense: number
-  transaction_count: number
-  receipt_count: number
-  ai_message_count: number
+  balance?: number
+  total_income?: number
+  total_expense?: number
+  transaction_count?: number
+  receipt_count?: number
+  ai_message_count?: number
   last_ai_activity_at?: string | null
-  ai_transaction_count: number
-  friend_count: number
-  devices: AdminUserDevice[]
-  monthly_dynamics: AdminMonthlyDynamic[]
-  top_categories: AdminTopCategory[]
-  recent_transactions: AdminUserTransaction[]
-  created_at: string
+  ai_transaction_count?: number
+  friend_count?: number
+  devices?: any[]
+  monthly_dynamics?: any[]
+  top_categories?: any[]
+  recent_transactions?: any[]
+  joined_at?: string
+  last_activity_at?: string | null
+  created_at?: string
 }
 
-export interface CategoryAnalyticsItem {
-  id: number
+export interface CategoryStatItem {
   name: string
-  type: 'income' | 'expense'
-  color: string
-  icon: string
-  usage_count: number
+  icon?: string
+  color?: string
   total_amount: number
+  transaction_count: number
+  user_count?: number
+  percentage?: number
 }
 
-export interface DeviceAnalyticsItem {
+export interface CategoriesAnalyticsData {
+  top_expense_categories: CategoryStatItem[]
+  top_income_categories: CategoryStatItem[]
+}
+
+export interface DevicePlatformItem {
   platform: string
-  device_count: number
+  count: number
   percentage: number
 }
 
-export interface DeletionAnalyticsItem {
+export interface DeviceModelItem {
+  device_name: string
+  count: number
+  percentage: number
+}
+
+export interface AppVersionItem {
+  app_version: string
+  count: number
+  percentage: number
+}
+
+export interface DevicesAnalyticsData {
+  total_active_devices: number
+  platforms: DevicePlatformItem[]
+  top_devices: DeviceModelItem[]
+  top_app_versions: AppVersionItem[]
+}
+
+export interface DeletionReasonItem {
+  reason: string
+  count: number
+  percentage: number
+}
+
+export interface RecentDeletionItem {
   id: number
   user_id: number
-  user_email: string
-  user_name: string
-  reason?: string | null
-  feedback?: string | null
+  email: string
+  full_name: string
+  auth_provider: string
+  reason: string
+  feedback?: string
+  total_transactions?: number
+  total_income?: number
+  total_expense?: number
+  registered_at?: string
   deleted_at: string
+}
+
+export interface DeletionsAnalyticsData {
+  total_deleted: number
+  deleted_this_month: number
+  reasons_breakdown: DeletionReasonItem[]
+  recent_deletions: RecentDeletionItem[]
+  total: number
+  limit: number
+  offset: number
 }
 
 export interface BroadcastNotification {
@@ -175,11 +223,22 @@ export interface BroadcastNotification {
   title: string
   body: string
   image_url?: string | null
-  status: 'sent' | 'scheduled' | 'cancelled' | 'pending'
+  status: 'sent' | 'scheduled' | 'cancelled' | 'pending' | string
   scheduled_at?: string | null
   sent_at?: string | null
-  recipient_count: number
+  target_type?: string
+  sent_count?: number
+  recipient_count?: number
+  created_by?: number
   created_at: string
+  updated_at?: string
+}
+
+export interface BroadcastListResponse {
+  items: BroadcastNotification[]
+  total: number
+  page: number
+  limit: number
 }
 
 export interface PermissionMeta {
@@ -190,11 +249,15 @@ export interface PermissionMeta {
 }
 
 export interface AdminUserWithPerms {
-  id: number
+  id?: number
+  user_id?: number
   full_name: string
   email: string
   avatar_url?: string | null
   is_super_admin: boolean
   permissions: string[]
-  created_at: string
+  permissions_count?: number
+  granted_at?: string
+  granted_by_name?: string
+  created_at?: string
 }

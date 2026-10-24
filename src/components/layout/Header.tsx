@@ -160,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-1.5 rounded-xl bg-finora-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-finora-600/30 hover:bg-finora-700"
+                  className="flex items-center gap-1.5 rounded-xl bg-finora-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-md shadow-finora-500/25 hover:bg-finora-600"
                 >
                   {savedSuccess ? (
                     <>

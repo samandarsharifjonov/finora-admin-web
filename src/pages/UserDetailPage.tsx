@@ -57,9 +57,10 @@ export const UserDetailPage: React.FC = () => {
 
   const handleBlockUser = async () => {
     if (!user) return
+    const targetId = user.user_id ?? user.id
     setActionLoading(true)
     try {
-      await apiRequest(`/admin/users/${user.id}/block`, {
+      await apiRequest(`/admin/users/${targetId}/block`, {
         method: 'POST',
         body: JSON.stringify({ reason: blockReason.trim() || 'Qoidabuzarlik sababli' }),
       })
@@ -76,9 +77,10 @@ export const UserDetailPage: React.FC = () => {
   const handleUnblockUser = async () => {
     if (!user) return
     if (!confirm('Ushbu foydalanuvchini blokdan chiqarmoqchimisiz?')) return
+    const targetId = user.user_id ?? user.id
     setActionLoading(true)
     try {
-      await apiRequest(`/admin/users/${user.id}/unblock`, { method: 'POST' })
+      await apiRequest(`/admin/users/${targetId}/unblock`, { method: 'POST' })
       fetchUserDetail()
     } catch (err: any) {
       alert(err?.message || "Blokdan chiqarishda xatolik")
@@ -95,9 +97,10 @@ export const UserDetailPage: React.FC = () => {
       return
     }
 
+    const targetId = user.user_id ?? user.id
     setActionLoading(true)
     try {
-      await apiRequest(`/admin/users/${user.id}`, { method: 'DELETE' })
+      await apiRequest(`/admin/users/${targetId}`, { method: 'DELETE' })
       alert("Foydalanuvchi butunlay o'chirildi")
       navigate('/users', { replace: true })
     } catch (err: any) {
@@ -240,7 +243,7 @@ export const UserDetailPage: React.FC = () => {
             <Wallet className="h-4 w-4 text-finora-500" />
           </div>
           <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
-            {formatCurrency(user.balance)}
+            {formatCurrency(user.balance ?? 0)}
           </div>
           <div className="mt-1 text-[11px] text-slate-400">
             Hamyonlar va kartalar bo'yicha
@@ -253,7 +256,7 @@ export const UserDetailPage: React.FC = () => {
             <ArrowDownRight className="h-4 w-4 text-emerald-500" />
           </div>
           <div className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            {formatCurrency(user.total_income)}
+            {formatCurrency(user.total_income ?? 0)}
           </div>
           <div className="mt-1 text-[11px] text-slate-400">
             Barcha tushumlar summasi
@@ -266,10 +269,10 @@ export const UserDetailPage: React.FC = () => {
             <ArrowUpRight className="h-4 w-4 text-rose-500" />
           </div>
           <div className="mt-2 text-2xl font-black text-rose-600 dark:text-rose-400">
-            {formatCurrency(user.total_expense)}
+            {formatCurrency(user.total_expense ?? 0)}
           </div>
           <div className="mt-1 text-[11px] text-slate-400">
-            Xarajatlar ({user.transaction_count} ta tranzaksiya)
+            Xarajatlar ({user.transaction_count ?? 0} ta tranzaksiya)
           </div>
         </div>
       </div>
@@ -293,7 +296,7 @@ export const UserDetailPage: React.FC = () => {
               <span>AI Xabarlar</span>
             </div>
             <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
-              {user.ai_message_count} ta
+              {user.ai_message_count ?? 0} ta
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
               Jami AI ga yozilgan savollar
@@ -307,7 +310,7 @@ export const UserDetailPage: React.FC = () => {
               <span>AI Xarajatlar</span>
             </div>
             <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
-              {user.ai_transaction_count} ta
+              {user.ai_transaction_count ?? 0} ta
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
               AI orqali kiritilgan tranzaksiyalar
@@ -321,7 +324,7 @@ export const UserDetailPage: React.FC = () => {
               <span>Do'stlari Soni</span>
             </div>
             <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
-              {user.friend_count} ta
+              {user.friend_count ?? 0} ta
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
               Ilovada tasdiqlangan do'stlar

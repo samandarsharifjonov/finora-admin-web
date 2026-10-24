@@ -40,8 +40,8 @@ export const LoginPage: React.FC = () => {
         <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-8 shadow-2xl backdrop-blur-xl dark:border-dark-border dark:bg-dark-card/90 sm:p-10">
           {/* Logo & Header */}
           <div className="text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-finora-600 to-indigo-500 shadow-xl shadow-finora-500/25">
-              <Sparkles className="h-7 w-7 text-white" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-finora-500 shadow-xl shadow-finora-500/25 text-slate-950">
+              <Sparkles className="h-7 w-7 text-slate-950" />
             </div>
             <h1 className="mt-5 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Finora Admin Hub
@@ -131,17 +131,17 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-finora-600 to-indigo-600 py-3 text-xs font-bold text-white shadow-lg shadow-finora-600/30 transition-all hover:opacity-95 active:scale-[0.99] disabled:opacity-60"
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-finora-500/25 transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-60"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
                   <span>Tekshirilmoqda...</span>
                 </div>
               ) : (
                 <>
                   <span>Tizimga kirish</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 text-slate-950" />
                 </>
               )}
             </button>

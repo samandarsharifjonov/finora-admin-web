@@ -73,7 +73,7 @@ export const TermsPage: React.FC = () => {
     }
   }
 
-  const pdfUrl = `${getBaseApiUrl().replace(/\/+$/, '')}/terms/view`
+  const pdfUrl = terms?.full_url || (terms?.file_url ? `${getBaseApiUrl().replace('/api/v1', '')}${terms.file_url}` : `${getBaseApiUrl().replace(/\/+$/, '')}/terms/view`)
 
   return (
     <div className="space-y-6">
@@ -119,7 +119,7 @@ export const TermsPage: React.FC = () => {
 
           {loading ? (
             <div className="py-8 text-center text-xs text-slate-400">Yuklanmoqda...</div>
-          ) : terms?.exists ? (
+          ) : (terms?.full_url || terms?.file_url || terms?.exists) ? (
             <div className="space-y-4">
               <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 dark:bg-dark-cardSecondary">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
@@ -127,7 +127,7 @@ export const TermsPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-bold text-xs text-slate-900 dark:text-white">
-                    {terms.filename || 'terms.pdf'}
+                    {terms.file_name || terms.filename || 'terms.pdf'}
                   </div>
                   <div className="text-[11px] text-slate-400">
                     Oxirgi yangilangan: {formatDate(terms.updated_at)}
@@ -140,7 +140,7 @@ export const TermsPage: React.FC = () => {
                   href={pdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-finora-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-finora-700"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-finora-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-md shadow-finora-500/25 hover:bg-finora-600"
                 >
                   <ExternalLink className="h-3.5 w-3.5" /> PDF ni ko'rish
                 </a>
@@ -183,7 +183,7 @@ export const TermsPage: React.FC = () => {
             <button
               type="submit"
               disabled={!selectedFile || uploading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-finora-600 py-2.5 text-xs font-bold text-white shadow-md hover:bg-finora-700 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-2.5 text-xs font-bold text-slate-950 shadow-md shadow-finora-500/25 hover:bg-finora-600 disabled:opacity-50"
             >
               <Upload className="h-4 w-4" />
               <span>{uploading ? 'Yuklanmoqda...' : 'Serverga yuklash'}</span>
