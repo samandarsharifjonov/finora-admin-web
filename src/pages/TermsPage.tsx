@@ -81,7 +81,7 @@ export const TermsPage: React.FC = () => {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Foydalanish Shartlari (Terms of Service)
+            Foydalanish shartlari
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
             Ilovada ko'rsatiladigan rasmiy shartlar va maxfiylik siyosati PDF fayli boshqaruvi

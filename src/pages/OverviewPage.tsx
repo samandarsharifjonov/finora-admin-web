@@ -121,7 +121,7 @@ export const OverviewPage: React.FC = () => {
               <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-dark-border dark:bg-dark-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Jami Foydalanuvchilar
+                    Jami foydalanuvchilar
                   </span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
                     <Users className="h-4 w-4" />
@@ -136,30 +136,30 @@ export const OverviewPage: React.FC = () => {
                   </span>
                 </div>
                 <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                  Shu oyda: <span className="font-semibold text-slate-700 dark:text-slate-200">+{newThisMonth} yangi</span>
+                  Oyda: <span className="font-semibold text-slate-700 dark:text-slate-200">+{newThisMonth} yangi</span>
                 </div>
               </div>
 
-              {/* DAU & MAU */}
+              {/* Activity */}
               <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-dark-border dark:bg-dark-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Faollik (DAU / MAU)
+                    Kunlik faollik
                   </span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400">
                     <Activity className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="mt-3 flex items-baseline gap-2">
+                <div className="mt-3 flex items-baseline gap-1.5">
                   <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                     {dau.toLocaleString()}
                   </span>
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    / {mau.toLocaleString()} MAU
+                    / {mau.toLocaleString()} oyda
                   </span>
                 </div>
                 <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                  Retention (saqlanish): <span className="font-bold text-finora-600 dark:text-finora-400">{retention.toFixed(1)}%</span>
+                  Sodiqlik: <span className="font-bold text-finora-600 dark:text-finora-400">{retention.toFixed(1)}%</span>
                 </div>
               </div>
 
@@ -167,7 +167,7 @@ export const OverviewPage: React.FC = () => {
               <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-dark-border dark:bg-dark-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Jami Tranzaksiyalar
+                    Jami tranzaksiyalar
                   </span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
                     <Wallet className="h-4 w-4" />
@@ -180,7 +180,7 @@ export const OverviewPage: React.FC = () => {
                   <span className="text-xs text-slate-500 dark:text-slate-400">ta</span>
                 </div>
                 <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-                  <span>Soliq cheklari:</span>
+                  <span>Cheklar:</span>
                   <span className="font-semibold text-slate-700 dark:text-slate-200">{totalReceipts} ta</span>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export const OverviewPage: React.FC = () => {
               <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-dark-border dark:bg-dark-card">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Foydalanuvchilar Balansi
+                    Foydalanuvchilar balansi
                   </span>
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
                     <TrendingUp className="h-4 w-4" />
@@ -202,10 +202,10 @@ export const OverviewPage: React.FC = () => {
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span className="text-emerald-600 dark:text-emerald-400 flex items-center">
-                    <ArrowDownRight className="h-3 w-3" /> {formatCompactCurrency(totalInc)}
+                    <ArrowDownRight className="h-3 w-3 mr-0.5" /> {formatCompactCurrency(totalInc)}
                   </span>
                   <span className="text-rose-600 dark:text-rose-400 flex items-center">
-                    <ArrowUpRight className="h-3 w-3" /> {formatCompactCurrency(totalExp)}
+                    <ArrowUpRight className="h-3 w-3 mr-0.5" /> {formatCompactCurrency(totalExp)}
                   </span>
                 </div>
               </div>
@@ -229,15 +229,15 @@ export const OverviewPage: React.FC = () => {
                   </div>
                   <div>
                     <h2 className="font-bold text-base text-slate-900 dark:text-white">
-                      Finora AI Tizim Faolligi
+                      Finora AI faolligi
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Sun'iy intellekt orqali foydalanuvchilar bilan muloqot va kiritilgan xarajatlar
+                      AI orqali yozishmalar va xarajatlar
                     </p>
                   </div>
                 </div>
                 <span className="rounded-full bg-finora-500/10 px-3 py-1 text-xs font-bold text-finora-700 dark:bg-finora-950 dark:text-finora-400 border border-finora-500/20">
-                  Aktiv
+                  Faol
                 </span>
               </div>
 
@@ -245,39 +245,39 @@ export const OverviewPage: React.FC = () => {
                 <div className="rounded-xl border border-slate-200/60 bg-white p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     <MessageSquare className="h-4 w-4 text-finora-500" />
-                    <span>AI ga Yozilgan Xabarlar</span>
+                    <span>AI xabarlari</span>
                   </div>
                   <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
                     {aiMsgCount.toLocaleString()}
                   </div>
                   <p className="mt-1 text-[11px] text-slate-400">
-                    Foydalanuvchilar tomonidan yozilgan jami savollar
+                    Foydalanuvchilar savollari soni
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-slate-200/60 bg-white p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    <span>AI Tranzaksiyalari</span>
+                    <span>AI xarajatlari</span>
                   </div>
                   <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
                     {aiTxCount.toLocaleString()}
                   </div>
                   <p className="mt-1 text-[11px] text-slate-400">
-                    AI ovoz/matn orqali avtomatik kiritilgan xarajatlar
+                    Avtomatik kiritilgan xarajatlar
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-slate-200/60 bg-white p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     <Receipt className="h-4 w-4 text-purple-500" />
-                    <span>Soliq OFD Cheklar</span>
+                    <span>Soliq cheklari</span>
                   </div>
                   <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
                     {totalReceipts.toLocaleString()}
                   </div>
                   <p className="mt-1 text-[11px] text-slate-400">
-                    QR-kod orqali muvaffaqiyatli skanerlangan cheklar
+                    Skanerlangan QR cheklar
                   </p>
                 </div>
               </div>

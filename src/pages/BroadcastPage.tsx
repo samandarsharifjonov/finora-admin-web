@@ -114,7 +114,7 @@ export const BroadcastPage: React.FC = () => {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Ommaviy Xabarnomalar (Broadcast)
+            Ommaviy xabarnomalar
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
             Barcha foydalanuvchilarga push-bildirishnomalar yuborish va rejalashtirish
@@ -138,7 +138,7 @@ export const BroadcastPage: React.FC = () => {
                 <Send className="h-4 w-4" />
               </div>
               <h2 className="font-bold text-sm text-slate-900 dark:text-white">
-                Yangi Xabarnoma Yaratish
+                Yangi xabar yuborish
               </h2>
             </div>
 
@@ -238,7 +238,7 @@ export const BroadcastPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <BellRing className="h-4 w-4 text-slate-500" />
                 <h2 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Yuborilgan Xabarnomalar Tarixi ({broadcasts.length})
+                  Yuborilgan xabarlar ({broadcasts.length})
                 </h2>
               </div>
               {broadcasts.length > 0 && (

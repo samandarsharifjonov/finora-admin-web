@@ -97,7 +97,7 @@ export const AnalyticsPage: React.FC = () => {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Tizim Analitikasi
+            Tizim analitikasi
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
             Toifalar sarfi, qurilmalar platformalari va o'chirilgan akkauntlar tahlili
@@ -122,7 +122,7 @@ export const AnalyticsPage: React.FC = () => {
               : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <BarChart3 className="h-4 w-4" /> Toifalar Tahlili (
+          <BarChart3 className="h-4 w-4" /> Toifalar tahlili (
           {expenseCategories.length + incomeCategories.length})
         </button>
         <button
@@ -133,7 +133,7 @@ export const AnalyticsPage: React.FC = () => {
               : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <Smartphone className="h-4 w-4" /> Qurilmalar va Ilova (
+          <Smartphone className="h-4 w-4" /> Qurilmalar va ilova (
           {devicesData?.total_active_devices ?? 0})
         </button>
         <button
@@ -144,7 +144,7 @@ export const AnalyticsPage: React.FC = () => {
               : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          <UserX className="h-4 w-4" /> O'chirilgan Akkauntlar (
+          <UserX className="h-4 w-4" /> O'chirilgan akkauntlar (
           {deletionsData?.total_deleted ?? deletionsData?.recent_deletions?.length ?? 0})
         </button>
       </div>
@@ -173,7 +173,7 @@ export const AnalyticsPage: React.FC = () => {
                       : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300'
                   }`}
                 >
-                  <TrendingDown className="h-3.5 w-3.5" /> Chiqim Toifalari ({expenseCategories.length})
+                  <TrendingDown className="h-3.5 w-3.5" /> Chiqim toifalari ({expenseCategories.length})
                 </button>
                 <button
                   onClick={() => setCategoryType('income')}
@@ -183,7 +183,7 @@ export const AnalyticsPage: React.FC = () => {
                       : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300'
                   }`}
                 >
-                  <TrendingUp className="h-3.5 w-3.5" /> Kirim Toifalari ({incomeCategories.length})
+                  <TrendingUp className="h-3.5 w-3.5" /> Kirim toifalari ({incomeCategories.length})
                 </button>
               </div>
 
@@ -197,7 +197,7 @@ export const AnalyticsPage: React.FC = () => {
                         <th className="px-5 py-3.5 text-center">Foydalanuvchilar</th>
                         <th className="px-5 py-3.5 text-center">Tranzaksiyalar soni</th>
                         <th className="px-5 py-3.5 text-right">Ulushi (%)</th>
-                        <th className="px-5 py-3.5 text-right">Jami Summa</th>
+                        <th className="px-5 py-3.5 text-right">Jami summa</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-dark-border/60">
@@ -258,7 +258,7 @@ export const AnalyticsPage: React.FC = () => {
               <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
                 <div>
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Jami Faol Qurilmalar
+                    Jami faol qurilmalar
                   </span>
                   <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">
                     {devicesData?.total_active_devices ?? 0} ta
@@ -275,7 +275,7 @@ export const AnalyticsPage: React.FC = () => {
                   <div className="flex items-center gap-2 mb-4">
                     <Layers className="h-4 w-4 text-finora-500" />
                     <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                      Operatsion Tizimlar (Platformalar)
+                      Operatsion tizimlar
                     </h3>
                   </div>
                   <div className="space-y-4">
@@ -311,7 +311,7 @@ export const AnalyticsPage: React.FC = () => {
                   <div className="flex items-center gap-2 mb-4">
                     <Info className="h-4 w-4 text-indigo-500" />
                     <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                      Ilova Versiyalari Taqsimoti
+                      Ilova versiyalari
                     </h3>
                   </div>
                   <div className="space-y-4">
@@ -348,7 +348,7 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Cpu className="h-4 w-4 text-emerald-500" />
                   <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                    Eng Ko'p Ishlatilayotgan Qurilma Modellari
+                    Ommabop qurilmalar
                   </h3>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -384,7 +384,7 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
                   <div>
                     <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                      Jami O'chirilgan Akkauntlar
+                      Jami o'chirilgan akkauntlar
                     </span>
                     <div className="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">
                       {deletionsData?.total_deleted ?? deletionsData?.recent_deletions?.length ?? 0} ta
@@ -398,7 +398,7 @@ export const AnalyticsPage: React.FC = () => {
                 <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card flex items-center justify-between">
                   <div>
                     <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                      Shu Oyda O'chirilganlar
+                      Shu oyda o'chirilganlar
                     </span>
                     <div className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">
                       {deletionsData?.deleted_this_month ?? 0} ta
@@ -414,7 +414,7 @@ export const AnalyticsPage: React.FC = () => {
               {deletionsData?.reasons_breakdown && deletionsData.reasons_breakdown.length > 0 && (
                 <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
                   <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                    Ketish Sabablari Tahlili
+                    Ketish sabablari
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {deletionsData.reasons_breakdown.map((r, i) => (
@@ -440,7 +440,7 @@ export const AnalyticsPage: React.FC = () => {
               <div className="rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-dark-border dark:bg-dark-card overflow-hidden">
                 <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-dark-border">
                   <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    O'chirilgan Akkauntlar Tarixi ({deletionsData?.recent_deletions?.length || 0})
+                    O'chirilgan akkauntlar ({deletionsData?.recent_deletions?.length || 0})
                   </div>
                   {deletionsData?.recent_deletions && deletionsData.recent_deletions.length > 0 && (
                     <button

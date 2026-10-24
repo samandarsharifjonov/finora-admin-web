@@ -48,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       ? [
           {
             to: '/admins',
-            label: 'Adminlar & Rollar',
+            label: 'Adminlar va rollar',
             icon: ShieldCheck,
           },
         ]
@@ -109,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Navigation list */}
         <nav className="flex-1 space-y-1 overflow-y-auto p-3.5">
           <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            Asosiy Menyu
+            Asosiy menyu
           </div>
           {navItems.map(item => {
             const Icon = item.icon

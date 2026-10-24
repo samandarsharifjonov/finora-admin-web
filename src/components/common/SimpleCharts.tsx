@@ -140,9 +140,9 @@ export const OverviewFlowChart: React.FC<OverviewFlowChartProps> = ({
       <div className="rounded-xl border border-slate-200/80 bg-white p-5 dark:border-dark-border dark:bg-dark-card">
         <div className="flex items-center justify-between text-xs mb-3">
           <span className="font-bold text-slate-900 dark:text-white">
-            Umumiy Moliyaviy Oqim (Kirim vs Chiqim)
+            Moliyaviy oqim
           </span>
-          <span className="text-slate-400 text-[11px]">Tizim bo'yicha jami</span>
+          <span className="text-slate-400 text-[11px]">Jami aylanma</span>
         </div>
 
         {/* Progress ratio bar */}
@@ -179,7 +179,7 @@ export const OverviewFlowChart: React.FC<OverviewFlowChartProps> = ({
       <div className="rounded-xl border border-slate-200/80 bg-white p-5 dark:border-dark-border dark:bg-dark-card">
         <div className="flex items-center justify-between text-xs mb-3">
           <span className="font-bold text-slate-900 dark:text-white">
-            Kunlik Faollik Nisbati (DAU / MAU)
+            Kunlik faollik
           </span>
           <span className="font-semibold text-finora-700 dark:text-finora-400">
             {dauPct}% faol
@@ -194,9 +194,9 @@ export const OverviewFlowChart: React.FC<OverviewFlowChartProps> = ({
         </div>
 
         <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-          <span>Bugungi faol: <strong className="text-slate-900 dark:text-white">{dau.toLocaleString()} ta</strong></span>
-          <span>Oylik faol: <strong className="text-slate-900 dark:text-white">{mau.toLocaleString()} ta</strong></span>
-          <span>Jami amallar: <strong className="text-slate-900 dark:text-white">{totalTx.toLocaleString()} ta</strong></span>
+          <span>Bugun: <strong className="text-slate-900 dark:text-white">{dau.toLocaleString()} ta</strong></span>
+          <span>Oyda: <strong className="text-slate-900 dark:text-white">{mau.toLocaleString()} ta</strong></span>
+          <span>Amallar: <strong className="text-slate-900 dark:text-white">{totalTx.toLocaleString()} ta</strong></span>
         </div>
       </div>
     </div>

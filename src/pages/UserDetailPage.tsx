@@ -245,7 +245,7 @@ export const UserDetailPage: React.FC = () => {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Joriy Balans</span>
+            <span>Joriy balans</span>
             <Wallet className="h-4 w-4 text-finora-500" />
           </div>
           <div className="mt-2 text-2xl font-black text-slate-900 dark:text-white">
@@ -258,7 +258,7 @@ export const UserDetailPage: React.FC = () => {
 
         <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Jami Kirim</span>
+            <span>Jami kirim</span>
             <ArrowDownRight className="h-4 w-4 text-emerald-500" />
           </div>
           <div className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
@@ -271,7 +271,7 @@ export const UserDetailPage: React.FC = () => {
 
         <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Jami Chiqim</span>
+            <span>Jami chiqim</span>
             <ArrowUpRight className="h-4 w-4 text-rose-500" />
           </div>
           <div className="mt-2 text-2xl font-black text-rose-600 dark:text-rose-400">
@@ -283,14 +283,14 @@ export const UserDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Finora AI & Social Section (2x2 Matrix matching mobile admin!) */}
+      {/* Finora AI & Social Section */}
       <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card">
         <div className="flex items-center gap-2.5 border-b border-slate-100 pb-4 dark:border-dark-border">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-finora-100 text-finora-600 dark:bg-finora-950 dark:text-finora-400">
             <Sparkles className="h-4 w-4" />
           </div>
           <h2 className="font-bold text-base text-slate-900 dark:text-white">
-            Finora AI va Ijtimoiy Faollik
+            Finora AI va do'stlar
           </h2>
         </div>
 
@@ -299,13 +299,13 @@ export const UserDetailPage: React.FC = () => {
           <div className="rounded-xl border border-slate-200/60 bg-slate-50/50 p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
             <div className="flex items-center gap-2 text-xs font-semibold text-finora-600 dark:text-finora-400">
               <MessageSquare className="h-4 w-4" />
-              <span>AI Xabarlar</span>
+              <span>AI xabarlari</span>
             </div>
             <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
               {user.ai_message_count ?? 0} ta
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
-              Jami AI ga yozilgan savollar
+              Jami savollar soni
             </p>
           </div>
 
@@ -313,13 +313,13 @@ export const UserDetailPage: React.FC = () => {
           <div className="rounded-xl border border-slate-200/60 bg-slate-50/50 p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
             <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 dark:text-blue-400">
               <Sparkles className="h-4 w-4" />
-              <span>AI Xarajatlar</span>
+              <span>AI xarajatlari</span>
             </div>
             <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
               {user.ai_transaction_count ?? 0} ta
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
-              AI orqali kiritilgan tranzaksiyalar
+              Avtomatik kiritilgan xarajatlar
             </p>
           </div>
 
@@ -327,13 +327,13 @@ export const UserDetailPage: React.FC = () => {
           <div className="rounded-xl border border-slate-200/60 bg-slate-50/50 p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
               <FriendsIcon className="h-4 w-4" />
-              <span>Do'stlari Soni</span>
+              <span>Do'stlar soni</span>
             </div>
             <div className="mt-2 text-xl font-black text-slate-900 dark:text-white">
               {user.friend_count ?? 0} ta
             </div>
             <p className="mt-1 text-[11px] text-slate-400">
-              Ilovada tasdiqlangan do'stlar
+              Tasdiqlangan do'stlar
             </p>
           </div>
 
@@ -341,7 +341,7 @@ export const UserDetailPage: React.FC = () => {
           <div className="rounded-xl border border-slate-200/60 bg-slate-50/50 p-4 dark:border-dark-border/60 dark:bg-dark-cardSecondary">
             <div className="flex items-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
               <Clock className="h-4 w-4" />
-              <span>Oxirgi AI Faollik</span>
+              <span>Oxirgi faollik</span>
             </div>
             <div className="mt-2 text-sm font-bold text-slate-900 dark:text-white truncate">
               {user.last_ai_activity_at ? formatDate(user.last_ai_activity_at) : "Hali yo'q"}
@@ -360,11 +360,11 @@ export const UserDetailPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-finora-600 dark:text-finora-400" />
               <h2 className="font-bold text-sm text-slate-900 dark:text-white">
-                Oylik Moliyaviy Dinamika (Grafik tahlil)
+                Oylik dinamika
               </h2>
             </div>
             <span className="text-[11px] text-slate-400 font-medium">
-              Oxirgi {user.monthly_dynamics.length} oy ko'rsatkichlari
+              Oxirgi {user.monthly_dynamics.length} oy
             </span>
           </div>
 
@@ -387,7 +387,7 @@ export const UserDetailPage: React.FC = () => {
           <div className="flex items-center gap-2 border-b border-slate-100 pb-3 dark:border-dark-border">
             <Smartphone className="h-4 w-4 text-slate-500" />
             <h2 className="font-bold text-sm text-slate-900 dark:text-white">
-              Ulangan Qurilmalar ({user.devices?.length || 0})
+              Ulangan qurilmalar ({user.devices?.length || 0})
             </h2>
           </div>
 
@@ -424,7 +424,7 @@ export const UserDetailPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-slate-500" />
               <h2 className="font-bold text-sm text-slate-900 dark:text-white">
-                Oxirgi Tranzaksiyalar ({user.recent_transactions?.length || 0} ta)
+                Oxirgi tranzaksiyalar ({user.recent_transactions?.length || 0} ta)
               </h2>
             </div>
             <span className="rounded-md bg-slate-100 dark:bg-dark-cardSecondary px-2 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
