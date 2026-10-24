@@ -8,16 +8,27 @@ export function setBaseApiUrl(url: string): void {
   localStorage.setItem('finora_api_url', url)
 }
 
+// Purge any legacy persistent tokens from localStorage for maximum security
+try {
+  localStorage.removeItem('finora_admin_token')
+} catch (_) {}
+
 export function getToken(): string | null {
-  return localStorage.getItem('finora_admin_token')
+  return sessionStorage.getItem('finora_admin_token')
 }
 
 export function setToken(token: string): void {
-  localStorage.setItem('finora_admin_token', token)
+  sessionStorage.setItem('finora_admin_token', token)
+  try {
+    localStorage.removeItem('finora_admin_token')
+  } catch (_) {}
 }
 
 export function removeToken(): void {
-  localStorage.removeItem('finora_admin_token')
+  sessionStorage.removeItem('finora_admin_token')
+  try {
+    localStorage.removeItem('finora_admin_token')
+  } catch (_) {}
 }
 
 interface RequestOptions extends RequestInit {
