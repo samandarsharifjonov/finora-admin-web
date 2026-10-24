@@ -7,6 +7,7 @@ interface AuthContextType {
   token: string | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
+  loginWithQr: (token: string, user: User) => void
   logout: () => void
   refreshUser: () => Promise<void>
   hasPermission: (permission: string) => boolean
@@ -79,6 +80,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  const loginWithQr = (token: string, user: User) => {
+    setToken(token)
+    setTokenState(token)
+    setUser(user)
+  }
+
   const logout = () => {
     removeToken()
     setTokenState(null)
@@ -102,6 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         token,
         isLoading,
         login,
+        loginWithQr,
         logout,
         refreshUser,
         hasPermission,

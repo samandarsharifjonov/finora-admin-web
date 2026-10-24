@@ -2,12 +2,16 @@ import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { AutoLockOverlay } from './AutoLockOverlay'
 
 export const Layout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-dark-bg">
+      {/* 5-minute Inactivity Auto-Lock Overlay */}
+      <AutoLockOverlay />
+
       {/* Sidebar */}
       <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
