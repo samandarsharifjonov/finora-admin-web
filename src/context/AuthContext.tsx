@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { apiRequest, getToken, removeToken, setToken } from '../lib/api'
-import type { AuthResponse, User } from '../types'
+import type { User } from '../types'
 
 interface AuthContextType {
   user: User | null
@@ -26,9 +26,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(false)
         return
       }
-      const data = await apiRequest<User>('/auth/me')
-      if (data && (data.is_admin || data.is_super_admin)) {
-        setUser(data)
+      const data = await apiRequest<any>('/auth/me')
+      const userData = data?.data || data
+      if (userData && (userData.is_admin || userData.is_super_admin)) {
+        setUser(userData)
       } else {
         // Not an admin
         logout()
@@ -47,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      const resp = await apiRequest<AuthResponse>('/auth/login', {
+      const resp = await apiRequest<any>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({
           email,
@@ -58,17 +59,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }),
       })
 
-      if (!resp.token || !resp.user) {
+      const authData = resp?.data || resp
+      const token = authData?.token
+      const user = authData?.user
+
+      if (!token || !user) {
         throw new Error("Serverdan kutilmagan javob qaytdi")
       }
 
-      if (!resp.user.is_admin && !resp.user.is_super_admin) {
+      if (!user.is_admin && !user.is_super_admin) {
         throw new Error("Kechirasiz, ushbu hisobda Admin boshqaruv ruxsati mavjud emas!")
       }
 
-      setToken(resp.token)
-      setTokenState(resp.token)
-      setUser(resp.user)
+      setToken(token)
+      setTokenState(token)
+      setUser(user)
     } finally {
       setIsLoading(false)
     }

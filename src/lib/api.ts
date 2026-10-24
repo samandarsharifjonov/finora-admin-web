@@ -69,12 +69,18 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestOpti
     throw new Error('Sessiya muddati tugadi, qaytadan tizimga kiring')
   }
 
-  const data = await response.json().catch(() => null)
+  const resJson = await response.json().catch(() => null)
 
   if (!response.ok) {
-    const errorMsg = data?.error || data?.message || `Xatolik: ${response.status} ${response.statusText}`
+    const errorMsg = resJson?.error || resJson?.message || `Xatolik: ${response.status} ${response.statusText}`
     throw new Error(errorMsg)
   }
 
-  return data
+  // Go backend wraps all responses in { success: boolean, message?: string, data?: any }
+  if (resJson && typeof resJson === 'object' && 'data' in resJson && resJson.data !== undefined) {
+    return resJson.data
+  }
+
+  return resJson
 }
+
