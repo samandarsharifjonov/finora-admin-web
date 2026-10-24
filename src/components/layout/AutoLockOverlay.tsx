@@ -22,9 +22,11 @@ export const AutoLockOverlay: React.FC = () => {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const lastActivityRef = useRef<number>(Date.now())
 
   // Reset activity timer
   const resetTimer = () => {
+    lastActivityRef.current = Date.now()
     if (isLocked) return // Don't reset if already locked
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => {
@@ -55,17 +57,35 @@ export const AutoLockOverlay: React.FC = () => {
     }
   }
 
-  // Activity event listeners
+  // Activity event listeners & tab visibility handling
   useEffect(() => {
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll']
     const handler = () => resetTimer()
 
+    const onVisibilityOrFocusChange = () => {
+      if (isLocked) return
+      const elapsed = Date.now() - lastActivityRef.current
+      if (elapsed >= INACTIVITY_TIMEOUT) {
+        lockScreen()
+      } else {
+        if (timerRef.current) clearTimeout(timerRef.current)
+        timerRef.current = setTimeout(() => {
+          lockScreen()
+        }, Math.max(0, INACTIVITY_TIMEOUT - elapsed))
+      }
+    }
+
     events.forEach(evt => window.addEventListener(evt, handler, { passive: true }))
+    document.addEventListener('visibilitychange', onVisibilityOrFocusChange)
+    window.addEventListener('focus', onVisibilityOrFocusChange)
+
     resetTimer()
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
       events.forEach(evt => window.removeEventListener(evt, handler))
+      document.removeEventListener('visibilitychange', onVisibilityOrFocusChange)
+      window.removeEventListener('focus', onVisibilityOrFocusChange)
     }
   }, [isLocked])
 
