@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { PermissionGuard } from './components/PermissionGuard'
 import { Layout } from './components/layout/Layout'
 
 import { LoginPage } from './pages/LoginPage'
@@ -13,6 +14,44 @@ import { BroadcastPage } from './pages/BroadcastPage'
 import { AdminsPage } from './pages/AdminsPage'
 import { TermsPage } from './pages/TermsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+
+const DashboardRoute: React.FC = () => {
+  const { user, hasPermission } = useAuth()
+  if (!user) return null
+
+  if (user.is_super_admin || hasPermission('overview.view')) {
+    return <OverviewPage />
+  }
+
+  // Redirect to first permitted section
+  if (hasPermission('users.view')) {
+    return <Navigate to="/users" replace />
+  }
+  if (
+    hasPermission('categories.analytics') ||
+    hasPermission('devices.analytics') ||
+    hasPermission('deletions.analytics')
+  ) {
+    return <Navigate to="/analytics" replace />
+  }
+  if (hasPermission('broadcast.send')) {
+    return <Navigate to="/notifications" replace />
+  }
+  if (hasPermission('terms.manage')) {
+    return <Navigate to="/terms" replace />
+  }
+
+  return (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center p-6 text-center">
+      <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+        Xush kelibsiz!
+      </h2>
+      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        Sizning hisobingizga hali biron-bir boshqaruv bo'limi biriktirilmagan. Iltimos, Super Admin bilan bog'laning.
+      </p>
+    </div>
+  )
+}
 
 export function App() {
   return (
@@ -32,13 +71,61 @@ export function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<OverviewPage />} />
-              <Route path="users" element={<UsersPage />} />
-              <Route path="users/:id" element={<UserDetailPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="notifications" element={<BroadcastPage />} />
-              <Route path="admins" element={<AdminsPage />} />
-              <Route path="terms" element={<TermsPage />} />
+              <Route index element={<DashboardRoute />} />
+              <Route
+                path="users"
+                element={
+                  <PermissionGuard permission="users.view">
+                    <UsersPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="users/:id"
+                element={
+                  <PermissionGuard permission="users.view">
+                    <UserDetailPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="analytics"
+                element={
+                  <PermissionGuard
+                    permission={[
+                      'categories.analytics',
+                      'devices.analytics',
+                      'deletions.analytics',
+                    ]}
+                  >
+                    <AnalyticsPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="notifications"
+                element={
+                  <PermissionGuard permission="broadcast.send">
+                    <BroadcastPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="admins"
+                element={
+                  <PermissionGuard superAdminOnly>
+                    <AdminsPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="terms"
+                element={
+                  <PermissionGuard permission="terms.manage">
+                    <TermsPage />
+                  </PermissionGuard>
+                }
+              />
               <Route path="404" element={<NotFoundPage />} />
               <Route path="*" element={<Navigate to="/404" replace />} />
             </Route>

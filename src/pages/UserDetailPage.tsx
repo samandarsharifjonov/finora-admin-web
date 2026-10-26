@@ -22,6 +22,7 @@ import {
   BarChart3,
 } from 'lucide-react'
 import { apiRequest } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
 import type { AdminUserDetail } from '../types'
 import { formatCurrency, formatDate } from '../lib/utils'
 import { UserAvatar } from '../components/common/UserAvatar'
@@ -30,6 +31,9 @@ import { MonthlyDynamicsChart } from '../components/common/SimpleCharts'
 export const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { hasPermission } = useAuth()
+  const canBlock = hasPermission('users.block')
+  const canDelete = hasPermission('users.delete')
 
   const [user, setUser] = useState<AdminUserDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -209,33 +213,36 @@ export const UserDetailPage: React.FC = () => {
           </div>
 
           {/* Action buttons */}
-          {!user.is_super_admin && (
+          {!user.is_super_admin && (canBlock || canDelete) && (
             <div className="flex flex-wrap items-center gap-1.5">
-              {user.is_blocked ? (
+              {canBlock &&
+                (user.is_blocked ? (
+                  <button
+                    disabled={actionLoading}
+                    onClick={handleUnblockUser}
+                    className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 transition-colors"
+                  >
+                    <Unlock className="h-3 w-3" /> Blokdan chiqarish
+                  </button>
+                ) : (
+                  <button
+                    disabled={actionLoading}
+                    onClick={() => setShowBlockModal(true)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300 dark:hover:border-rose-900/60 dark:hover:bg-rose-950/30 dark:hover:text-rose-400 transition-colors"
+                  >
+                    <Lock className="h-3 w-3" /> Bloklash
+                  </button>
+                ))}
+
+              {canDelete && (
                 <button
                   disabled={actionLoading}
-                  onClick={handleUnblockUser}
-                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 transition-colors"
+                  onClick={handleDeleteUser}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-400 dark:hover:border-rose-900/60 dark:hover:bg-rose-950/30 dark:hover:text-rose-400 transition-colors"
                 >
-                  <Unlock className="h-3 w-3" /> Blokdan chiqarish
-                </button>
-              ) : (
-                <button
-                  disabled={actionLoading}
-                  onClick={() => setShowBlockModal(true)}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300 dark:hover:border-rose-900/60 dark:hover:bg-rose-950/30 dark:hover:text-rose-400 transition-colors"
-                >
-                  <Lock className="h-3 w-3" /> Bloklash
+                  <Trash2 className="h-3 w-3" /> O'chirish
                 </button>
               )}
-
-              <button
-                disabled={actionLoading}
-                onClick={handleDeleteUser}
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-400 dark:hover:border-rose-900/60 dark:hover:bg-rose-950/30 dark:hover:text-rose-400 transition-colors"
-              >
-                <Trash2 className="h-3 w-3" /> O'chirish
-              </button>
             </div>
           )}
         </div>

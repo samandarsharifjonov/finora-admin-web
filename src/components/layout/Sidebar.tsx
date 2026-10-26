@@ -19,32 +19,58 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { user } = useAuth()
+  const { user, hasPermission } = useAuth()
   const logoUrl = `${import.meta.env.BASE_URL}logo.png`
 
+  const canOverview = hasPermission('overview.view')
+  const canUsers = hasPermission('users.view')
+  const canAnalytics =
+    hasPermission('categories.analytics') ||
+    hasPermission('devices.analytics') ||
+    hasPermission('deletions.analytics')
+  const canBroadcast = hasPermission('broadcast.send')
+  const canTerms = hasPermission('terms.manage')
+  const isSuperAdmin = user?.is_super_admin ?? false
+
   const navItems = [
-    {
-      to: '/',
-      label: 'Boshqaruv',
-      icon: LayoutDashboard,
-      exact: true,
-    },
-    {
-      to: '/users',
-      label: 'Foydalanuvchilar',
-      icon: Users,
-    },
-    {
-      to: '/analytics',
-      label: 'Analitika',
-      icon: BarChart3,
-    },
-    {
-      to: '/notifications',
-      label: 'Xabarnomalar',
-      icon: BellRing,
-    },
-    ...(user?.is_super_admin
+    ...(canOverview
+      ? [
+          {
+            to: '/',
+            label: 'Boshqaruv',
+            icon: LayoutDashboard,
+            exact: true,
+          },
+        ]
+      : []),
+    ...(canUsers
+      ? [
+          {
+            to: '/users',
+            label: 'Foydalanuvchilar',
+            icon: Users,
+          },
+        ]
+      : []),
+    ...(canAnalytics
+      ? [
+          {
+            to: '/analytics',
+            label: 'Analitika',
+            icon: BarChart3,
+          },
+        ]
+      : []),
+    ...(canBroadcast
+      ? [
+          {
+            to: '/notifications',
+            label: 'Xabarnomalar',
+            icon: BellRing,
+          },
+        ]
+      : []),
+    ...(isSuperAdmin
       ? [
           {
             to: '/admins',
@@ -53,11 +79,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           },
         ]
       : []),
-    {
-      to: '/terms',
-      label: 'Foydalanish shartlari',
-      icon: FileText,
-    },
+    ...(canTerms
+      ? [
+          {
+            to: '/terms',
+            label: 'Foydalanish shartlari',
+            icon: FileText,
+          },
+        ]
+      : []),
   ]
 
   return (
