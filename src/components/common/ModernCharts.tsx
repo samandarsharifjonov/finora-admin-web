@@ -462,10 +462,62 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
 }) => {
   const numScore = typeof score === 'number' && !isNaN(score) ? score : 84.6
   const clampedScore = Math.min(100, Math.max(0, numScore))
-  const needleAngle = (clampedScore / 100) * 180 - 90
+  const [animatedScore, setAnimatedScore] = React.useState(0)
   const safeBreakdown = Array.isArray(breakdown) ? breakdown : []
   const uniqueId = React.useId().replace(/:/g, '')
   const gradientId = `gauge-gradient-${uniqueId}`
+
+  // Animate the needle & arc from 0 to target score smoothly
+  React.useEffect(() => {
+    let frameId: number
+    let startTimestamp: number | null = null
+    const duration = 850 // ms
+    const targetScore = clampedScore
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp
+      const elapsed = timestamp - startTimestamp
+      const progress = Math.min(elapsed / duration, 1)
+
+      // Smooth cubic ease-out
+      const ease = 1 - Math.pow(1 - progress, 3)
+      setAnimatedScore(targetScore * ease)
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(step)
+      } else {
+        setAnimatedScore(targetScore)
+      }
+    }
+
+    frameId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(frameId)
+  }, [clampedScore])
+
+  // Precise mathematical speedometer needle calculation (pure SVG coordinates, no CSS transform bugs)
+  const cx = 110
+  const cy = 110
+  const needleLength = 56
+  const tailLength = 10
+  const baseWidth = 3.2
+
+  const angleDeg = 180 - (animatedScore / 100) * 180
+  const rad = (angleDeg * Math.PI) / 180
+  const ux = Math.cos(rad)
+  const uy = -Math.sin(rad)
+  const vx = -Math.sin(rad)
+  const vy = -Math.cos(rad)
+
+  const tipX = cx + needleLength * ux
+  const tipY = cy + needleLength * uy
+  const rightX = cx + baseWidth * vx
+  const rightY = cy + baseWidth * vy
+  const tailX = cx - tailLength * ux
+  const tailY = cy - tailLength * uy
+  const leftX = cx - baseWidth * vx
+  const leftY = cy - baseWidth * vy
+
+  const needlePath = `M ${tipX.toFixed(2)} ${tipY.toFixed(2)} L ${rightX.toFixed(2)} ${rightY.toFixed(2)} L ${tailX.toFixed(2)} ${tailY.toFixed(2)} L ${leftX.toFixed(2)} ${leftY.toFixed(2)} Z`
 
   // Dynamic badge text and color based on score
   const badgeConfig = badgeLabel
@@ -514,6 +566,9 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
                 <stop offset="50%" stopColor="#3B82F6" />
                 <stop offset="100%" stopColor="#10B981" />
               </linearGradient>
+              <filter id={`needle-shadow-${uniqueId}`} x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" floodColor="#000000" floodOpacity="0.3" />
+              </filter>
             </defs>
 
             {/* Background Arc */}
@@ -534,31 +589,53 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
               strokeWidth="14"
               strokeLinecap="round"
               strokeDasharray="226.19"
-              strokeDashoffset={226.19 - (clampedScore / 100) * 226.19}
-              className="transition-all duration-1000 ease-out"
+              strokeDashoffset={226.19 - (animatedScore / 100) * 226.19}
             />
 
-            {/* Needle Pivot & Indicator inside SVG */}
-            <g
-              transform={`rotate(${needleAngle} 110 110)`}
-              style={{
-                transformOrigin: '110px 110px',
-                transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              }}
-            >
-              <line
-                x1="110"
-                y1="110"
-                x2="110"
-                y2="52"
-                stroke="currentColor"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                className="text-slate-800 dark:text-white"
-              />
-            </g>
-            <circle cx="110" cy="110" r="7" className="fill-slate-900 dark:fill-white" />
-            <circle cx="110" cy="110" r="2.5" className="fill-white dark:fill-slate-900" />
+            {/* Speedometer Scale Ticks */}
+            {[0, 25, 50, 75, 100].map(pct => {
+              const tickRad = ((180 - pct * 1.8) * Math.PI) / 180
+              const x1 = (110 + 60 * Math.cos(tickRad)).toFixed(1)
+              const y1 = (110 - 60 * Math.sin(tickRad)).toFixed(1)
+              const x2 = (110 + 64 * Math.cos(tickRad)).toFixed(1)
+              const y2 = (110 - 64 * Math.sin(tickRad)).toFixed(1)
+              return (
+                <line
+                  key={pct}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className="text-slate-300 dark:text-slate-700"
+                />
+              )
+            })}
+
+            {/* Speedometer Needle (Pointer + Tail) */}
+            <path
+              d={needlePath}
+              fill="#EF4444"
+              filter={`url(#needle-shadow-${uniqueId})`}
+            />
+
+            {/* Center Pivot Hub */}
+            <circle
+              cx="110"
+              cy="110"
+              r="7"
+              className="fill-slate-900 dark:fill-slate-100"
+              stroke="#EF4444"
+              strokeWidth="1.5"
+            />
+            <circle
+              cx="110"
+              cy="110"
+              r="2.5"
+              fill="#EF4444"
+            />
           </svg>
         </div>
 
