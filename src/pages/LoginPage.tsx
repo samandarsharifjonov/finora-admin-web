@@ -32,7 +32,14 @@ interface QRStatusResponse {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
-  const { login, loginWithQr } = useAuth()
+  const { user, token, login, loginWithQr } = useAuth()
+
+  // Auto-redirect to dashboard if already logged in
+  useEffect(() => {
+    if (token && user) {
+      navigate('/', { replace: true })
+    }
+  }, [token, user, navigate])
 
   // Login mode: 'qr' | 'password'
   const [authMode, setAuthMode] = useState<'qr' | 'password'>('qr')

@@ -24,20 +24,21 @@ import { Link } from 'react-router-dom'
 
 // 1. Sparkline Mini Trend Chart
 interface SparklineChartProps {
-  data: number[]
+  data?: number[]
   color?: string
   height?: number
   isPositive?: boolean
 }
 
 export const SparklineChart: React.FC<SparklineChartProps> = ({
-  data,
+  data = [],
   color,
   height = 36,
   isPositive = true,
 }) => {
   const chartColor = color || (isPositive ? '#10B981' : '#F43F5E')
-  const chartData = data.map((val, idx) => ({ idx, val }))
+  const safeData = Array.isArray(data) ? data : []
+  const chartData = safeData.map((val, idx) => ({ idx, val: typeof val === 'number' && !isNaN(val) ? val : 0 }))
   const uniqueId = React.useId()
   const gradientId = `sparkline-grad-${uniqueId.replace(/:/g, '')}`
 
@@ -75,11 +76,13 @@ export interface MonthlyFlowItem {
 }
 
 interface GroupedBarChartProps {
-  data: MonthlyFlowItem[]
+  data?: MonthlyFlowItem[]
   height?: number
 }
 
-export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 240 }) => {
+export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data = [], height = 240 }) => {
+  const safeData = Array.isArray(data) ? data : []
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between pb-3">
@@ -105,7 +108,7 @@ export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height =
 
       <div style={{ height: `${height}px` }} className="w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 10, right: 10, left: -16, bottom: 0 }}>
+          <BarChart data={safeData} margin={{ top: 10, right: 10, left: -16, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-200 dark:text-dark-border" />
             <XAxis
               dataKey="label"
@@ -123,26 +126,32 @@ export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height =
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
+                  const inc = payload[0]?.value as number | undefined
+                  const exp = payload[1]?.value as number | undefined
                   return (
                     <div className="rounded-xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm dark:border-dark-border dark:bg-dark-card/95">
-                      <p className="font-bold text-xs text-slate-900 dark:text-white mb-1.5">{label}</p>
+                      <p className="font-bold text-xs text-slate-900 dark:text-white mb-1.5">{label || ''}</p>
                       <div className="space-y-1 text-[11px]">
-                        <p className="flex items-center justify-between gap-4 text-slate-700 dark:text-slate-300">
-                          <span className="flex items-center gap-1.5">
-                            <span className="h-2 w-2 rounded-full bg-slate-700 dark:bg-slate-300" /> Kirim:
-                          </span>
-                          <strong className="font-bold text-emerald-600 dark:text-emerald-400">
-                            +{formatCompactCurrency(payload[0]?.value as number)}
-                          </strong>
-                        </p>
-                        <p className="flex items-center justify-between gap-4 text-slate-700 dark:text-slate-300">
-                          <span className="flex items-center gap-1.5">
-                            <span className="h-2 w-2 rounded-full bg-amber-500" /> Chiqim:
-                          </span>
-                          <strong className="font-bold text-rose-600 dark:text-rose-400">
-                            -{formatCompactCurrency(payload[1]?.value as number)}
-                          </strong>
-                        </p>
+                        {inc !== undefined && (
+                          <p className="flex items-center justify-between gap-4 text-slate-700 dark:text-slate-300">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-slate-700 dark:bg-slate-300" /> Kirim:
+                            </span>
+                            <strong className="font-bold text-emerald-600 dark:text-emerald-400">
+                              +{formatCompactCurrency(inc)}
+                            </strong>
+                          </p>
+                        )}
+                        {exp !== undefined && (
+                          <p className="flex items-center justify-between gap-4 text-slate-700 dark:text-slate-300">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-amber-500" /> Chiqim:
+                            </span>
+                            <strong className="font-bold text-rose-600 dark:text-rose-400">
+                              -{formatCompactCurrency(exp)}
+                            </strong>
+                          </p>
+                        )}
                       </div>
                     </div>
                   )
@@ -168,11 +177,13 @@ export interface RadarItem {
 }
 
 interface EcosystemRadarProps {
-  data: RadarItem[]
+  data?: RadarItem[]
   height?: number
 }
 
-export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({ data, height = 240 }) => {
+export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({ data = [], height = 240 }) => {
+  const safeData = Array.isArray(data) ? data : []
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between pb-2">
@@ -198,7 +209,7 @@ export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({ data, heigh
 
       <div style={{ height: `${height}px` }} className="w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
+          <RadarChart cx="50%" cy="50%" outerRadius="72%" data={safeData}>
             <PolarGrid stroke="currentColor" className="text-slate-200 dark:text-dark-border" />
             <PolarAngleAxis
               dataKey="metric"
@@ -223,14 +234,15 @@ export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({ data, heigh
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0]?.payload
+                  if (!item) return null
                   return (
                     <div className="rounded-xl border border-slate-200 bg-white/95 p-2.5 shadow-lg backdrop-blur-sm dark:border-dark-border dark:bg-dark-card/95 text-xs">
-                      <p className="font-bold text-slate-900 dark:text-white">{item.metric}</p>
+                      <p className="font-bold text-slate-900 dark:text-white">{item.metric || ''}</p>
                       <p className="text-emerald-600 dark:text-emerald-400 mt-1">
-                        Joriy: <strong>{item.score}%</strong>
+                        Joriy: <strong>{item.score ?? 0}%</strong>
                       </p>
                       <p className="text-indigo-600 dark:text-indigo-400">
-                        Me'yor: <strong>{item.benchmark}%</strong>
+                        Me'yor: <strong>{item.benchmark ?? 0}%</strong>
                       </p>
                     </div>
                   )
@@ -252,11 +264,13 @@ export interface CustomerGrowthItem {
 }
 
 interface NewCustomersBarProps {
-  data: CustomerGrowthItem[]
+  data?: CustomerGrowthItem[]
   height?: number
 }
 
-export const NewCustomersBarChart: React.FC<NewCustomersBarProps> = ({ data, height = 180 }) => {
+export const NewCustomersBarChart: React.FC<NewCustomersBarProps> = ({ data = [], height = 180 }) => {
+  const safeData = Array.isArray(data) ? data : []
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between pb-2">
@@ -270,7 +284,7 @@ export const NewCustomersBarChart: React.FC<NewCustomersBarProps> = ({ data, hei
 
       <div style={{ height: `${height}px` }} className="w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
+          <BarChart data={safeData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-200 dark:text-dark-border" />
             <XAxis
               dataKey="label"
@@ -283,11 +297,12 @@ export const NewCustomersBarChart: React.FC<NewCustomersBarProps> = ({ data, hei
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
+                  const count = payload[0]?.value ?? 0
                   return (
                     <div className="rounded-xl border border-slate-200 bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm dark:border-dark-border dark:bg-dark-card/95 text-xs">
                       <span className="text-slate-500 dark:text-slate-400">{label}: </span>
                       <strong className="font-bold text-slate-900 dark:text-white">
-                        +{payload[0]?.value} ta foydalanuvchi
+                        +{count} ta foydalanuvchi
                       </strong>
                     </div>
                   )
@@ -311,19 +326,20 @@ export interface DonutSlice {
 }
 
 interface EngagementDonutProps {
-  data: DonutSlice[]
+  data?: DonutSlice[]
   totalLabel?: string
   totalCount?: number
   height?: number
 }
 
 export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
-  data,
+  data = [],
   totalLabel = 'Jami',
   totalCount,
   height = 190,
 }) => {
-  const total = totalCount ?? data.reduce((acc, cur) => acc + cur.value, 0)
+  const safeData = Array.isArray(data) ? data : []
+  const total = totalCount ?? safeData.reduce((acc, cur) => acc + (cur?.value || 0), 0)
 
   return (
     <div className="w-full">
@@ -340,14 +356,14 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={safeData}
               innerRadius={50}
               outerRadius={74}
               paddingAngle={3}
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {safeData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -355,11 +371,13 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const item = payload[0]?.payload
-                  const pct = total > 0 ? ((item.value / total) * 100).toFixed(1) : '0'
+                  if (!item) return null
+                  const val = item.value || 0
+                  const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0'
                   return (
                     <div className="rounded-xl border border-slate-200 bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm dark:border-dark-border dark:bg-dark-card/95 text-xs">
-                      <span className="font-semibold text-slate-900 dark:text-white">{item.name}: </span>
-                      <strong className="text-finora-700 dark:text-finora-400">{item.value} ta ({pct}%)</strong>
+                      <span className="font-semibold text-slate-900 dark:text-white">{item.name || ''}: </span>
+                      <strong className="text-finora-700 dark:text-finora-400">{val} ta ({pct}%)</strong>
                     </div>
                   )
                 }
@@ -382,12 +400,12 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
 
       {/* Legend below */}
       <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px]">
-        {data.map((item, idx) => (
+        {safeData.map((item, idx) => (
           <div key={idx} className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
             <span className="text-slate-600 dark:text-slate-400">{item.name}</span>
             <span className="font-bold text-slate-900 dark:text-slate-200">
-              {total > 0 ? Math.round((item.value / total) * 100) : 0}%
+              {total > 0 && item?.value ? Math.round((item.value / total) * 100) : 0}%
             </span>
           </div>
         ))}
@@ -398,9 +416,9 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
 
 // 6. Customer Satisfaction / Retention Gauge Chart ("Customer Satisfaction" style)
 interface CustomerGaugeProps {
-  score: number
+  score?: number
   title?: string
-  breakdown: Array<{
+  breakdown?: Array<{
     category: string
     range: string
     proportion: string
@@ -409,12 +427,14 @@ interface CustomerGaugeProps {
 }
 
 export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
-  score,
+  score = 84.6,
   title = "Foydalanuvchilar Sodiqligi",
-  breakdown,
+  breakdown = [],
 }) => {
-  const clampedScore = Math.min(100, Math.max(0, score))
+  const numScore = typeof score === 'number' && !isNaN(score) ? score : 84.6
+  const clampedScore = Math.min(100, Math.max(0, numScore))
   const needleAngle = (clampedScore / 100) * 180 - 90
+  const safeBreakdown = Array.isArray(breakdown) ? breakdown : []
 
   return (
     <div className="w-full flex flex-col justify-between h-full">
@@ -471,7 +491,7 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
         <div className="mt-2 text-center">
           <div className="flex items-baseline justify-center gap-1">
             <span className="text-2xl font-black text-slate-900 dark:text-white">
-              {score.toFixed(1)}
+              {numScore.toFixed(1)}
             </span>
             <span className="text-xs font-bold text-slate-500 uppercase">
               Ball
@@ -494,7 +514,7 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-dark-border/40 text-slate-600 dark:text-slate-300">
-            {breakdown.map((row, i) => (
+            {safeBreakdown.map((row, i) => (
               <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-dark-cardSecondary/30">
                 <td className="py-1.5 px-3 font-medium">
                   {row.category} <span className="text-[9.5px] text-slate-400">{row.range}</span>
@@ -522,11 +542,13 @@ export interface CashflowWavePoint {
 }
 
 interface WaveAreaChartProps {
-  data: CashflowWavePoint[]
+  data?: CashflowWavePoint[]
   height?: number
 }
 
-export const CashflowWaveAreaChart: React.FC<WaveAreaChartProps> = ({ data, height = 240 }) => {
+export const CashflowWaveAreaChart: React.FC<WaveAreaChartProps> = ({ data = [], height = 240 }) => {
+  const safeData = Array.isArray(data) ? data : []
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between pb-3">
@@ -552,7 +574,7 @@ export const CashflowWaveAreaChart: React.FC<WaveAreaChartProps> = ({ data, heig
 
       <div style={{ height: `${height}px` }} className="w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: -16, bottom: 0 }}>
+          <AreaChart data={safeData} margin={{ top: 10, right: 10, left: -16, bottom: 0 }}>
             <defs>
               <linearGradient id="incomeWave" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#334155" stopOpacity={0.25} />
@@ -580,22 +602,28 @@ export const CashflowWaveAreaChart: React.FC<WaveAreaChartProps> = ({ data, heig
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
+                  const inc = payload[0]?.value as number | undefined
+                  const exp = payload[1]?.value as number | undefined
                   return (
                     <div className="rounded-xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm dark:border-dark-border dark:bg-dark-card/95 text-xs">
-                      <p className="font-bold text-slate-900 dark:text-white mb-1.5">{label}</p>
+                      <p className="font-bold text-slate-900 dark:text-white mb-1.5">{label || ''}</p>
                       <div className="space-y-1">
-                        <div className="flex items-center justify-between gap-4">
-                          <span className="text-slate-500">Kirim:</span>
-                          <strong className="font-bold text-emerald-600 dark:text-emerald-400">
-                            +{formatCompactCurrency(payload[0]?.value as number)}
-                          </strong>
-                        </div>
-                        <div className="flex items-center justify-between gap-4">
-                          <span className="text-slate-500">Chiqim:</span>
-                          <strong className="font-bold text-amber-600 dark:text-amber-400">
-                            -{formatCompactCurrency(payload[1]?.value as number)}
-                          </strong>
-                        </div>
+                        {inc !== undefined && (
+                          <div className="flex items-center justify-between gap-4">
+                            <span className="text-slate-500">Kirim:</span>
+                            <strong className="font-bold text-emerald-600 dark:text-emerald-400">
+                              +{formatCompactCurrency(inc)}
+                            </strong>
+                          </div>
+                        )}
+                        {exp !== undefined && (
+                          <div className="flex items-center justify-between gap-4">
+                            <span className="text-slate-500">Chiqim:</span>
+                            <strong className="font-bold text-amber-600 dark:text-amber-400">
+                              -{formatCompactCurrency(exp)}
+                            </strong>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )
@@ -638,18 +666,31 @@ export interface PodiumUser {
 }
 
 interface PodiumRankingProps {
-  users: PodiumUser[]
+  users?: PodiumUser[]
   title?: string
 }
 
 export const PodiumRanking: React.FC<PodiumRankingProps> = ({
-  users,
+  users = [],
   title = "Eng Faol Foydalanuvchilar",
 }) => {
-  const top1 = users.find(u => u.rank === 1) || users[0]
-  const top2 = users.find(u => u.rank === 2) || users[1]
-  const top3 = users.find(u => u.rank === 3) || users[2]
-  const others = users.filter(u => u.rank > 3).slice(0, 2)
+  const safeUsers = Array.isArray(users) ? users : []
+  const top1 = safeUsers.find(u => u && u.rank === 1) || safeUsers[0]
+  const top2 = safeUsers.find(u => u && u.rank === 2) || safeUsers[1]
+  const top3 = safeUsers.find(u => u && u.rank === 3) || safeUsers[2]
+  const others = safeUsers.filter(u => u && u.rank > 3).slice(0, 2)
+
+  const formatFirstName = (name?: string | null) => {
+    if (!name) return 'Foydalanuvchi'
+    const clean = String(name).trim()
+    return clean.split(' ')[0] || clean
+  }
+
+  const formatScore = (val: any) => {
+    if (val === null || val === undefined) return '0'
+    if (typeof val === 'number') return val.toLocaleString()
+    return String(val)
+  }
 
   return (
     <div className="w-full flex flex-col justify-between h-full">
@@ -680,10 +721,10 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
               </span>
             </div>
             <span className="mt-2 text-xs font-bold text-slate-800 dark:text-slate-200 truncate max-w-[76px] text-center group-hover:text-finora-600">
-              {top2.name.split(' ')[0]}
+              {formatFirstName(top2.name)}
             </span>
             <span className="text-[11px] font-black text-slate-500 dark:text-slate-400">
-              {typeof top2.score === 'number' ? top2.score.toLocaleString() : top2.score}
+              {formatScore(top2.score)}
             </span>
           </Link>
         )}
@@ -703,10 +744,10 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
               </span>
             </div>
             <span className="mt-2 text-xs font-extrabold text-slate-900 dark:text-white truncate max-w-[88px] text-center group-hover:text-finora-600">
-              {top1.name.split(' ')[0]}
+              {formatFirstName(top1.name)}
             </span>
             <span className="text-xs font-black text-amber-600 dark:text-amber-400">
-              {typeof top1.score === 'number' ? top1.score.toLocaleString() : top1.score}
+              {formatScore(top1.score)}
             </span>
           </Link>
         )}
@@ -724,10 +765,10 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
               </span>
             </div>
             <span className="mt-2 text-xs font-bold text-slate-800 dark:text-slate-200 truncate max-w-[76px] text-center group-hover:text-finora-600">
-              {top3.name.split(' ')[0]}
+              {formatFirstName(top3.name)}
             </span>
             <span className="text-[11px] font-black text-slate-500 dark:text-slate-400">
-              {typeof top3.score === 'number' ? top3.score.toLocaleString() : top3.score}
+              {formatScore(top3.score)}
             </span>
           </Link>
         )}
@@ -735,21 +776,21 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
 
       {/* Others (4th, 5th) */}
       <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-dark-border/60">
-        {others.map((u) => (
+        {others.map((u, i) => (
           <Link
-            key={u.id}
-            to={`/users/${u.id}`}
+            key={u?.id || i}
+            to={`/users/${u?.id}`}
             className="flex items-center justify-between rounded-xl px-2.5 py-1.5 transition-colors hover:bg-slate-50 dark:hover:bg-dark-cardSecondary/60"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="text-[11px] font-bold text-slate-400 w-3 text-center">{u.rank}</span>
-              <UserAvatar src={u.avatar} name={u.name} email={u.email} size="sm" />
+              <span className="text-[11px] font-bold text-slate-400 w-3 text-center">{u?.rank || i + 4}</span>
+              <UserAvatar src={u?.avatar} name={u?.name} email={u?.email} size="sm" />
               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
-                {u.name}
+                {u?.name || 'Foydalanuvchi'}
               </span>
             </div>
             <span className="text-xs font-black text-slate-700 dark:text-slate-300">
-              {typeof u.score === 'number' ? u.score.toLocaleString() : u.score}
+              {formatScore(u?.score)}
             </span>
           </Link>
         ))}
@@ -757,3 +798,4 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
     </div>
   )
 }
+

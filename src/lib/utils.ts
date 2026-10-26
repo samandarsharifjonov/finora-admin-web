@@ -5,24 +5,29 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: number | string | undefined | null): string {
+  const num = typeof amount === 'number' ? amount : Number(amount)
+  if (amount === undefined || amount === null || isNaN(num)) return "0 so'm"
   return new Intl.NumberFormat('uz-UZ', {
     style: 'decimal',
     maximumFractionDigits: 0,
-  }).format(amount) + " so'm"
+  }).format(num) + " so'm"
 }
 
-export function formatCompactCurrency(amount: number): string {
-  if (Math.abs(amount) >= 1_000_000_000) {
-    return (amount / 1_000_000_000).toFixed(1) + ' mlrd'
+export function formatCompactCurrency(amount: number | string | undefined | null): string {
+  if (amount === undefined || amount === null) return "0"
+  const num = typeof amount === 'number' ? amount : Number(amount)
+  if (isNaN(num)) return "0"
+  if (Math.abs(num) >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(1) + ' mlrd'
   }
-  if (Math.abs(amount) >= 1_000_000) {
-    return (amount / 1_000_000).toFixed(1) + ' mln'
+  if (Math.abs(num) >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1) + ' mln'
   }
-  if (Math.abs(amount) >= 1_000) {
-    return (amount / 1_000).toFixed(0) + ' ming'
+  if (Math.abs(num) >= 1_000) {
+    return (num / 1_000).toFixed(0) + ' ming'
   }
-  return formatCurrency(amount)
+  return formatCurrency(num)
 }
 
 export function formatDate(dateStr?: string | null): string {

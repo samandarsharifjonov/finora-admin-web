@@ -38,6 +38,8 @@ import {
   type PodiumUser,
 } from '../components/common/ModernCharts'
 
+const MONTH_NAMES = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyun', 'Iyul', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek']
+
 export const OverviewPage: React.FC = () => {
   const [data, setData] = useState<AdminOverview | null>(null)
   const [chartsData, setChartsData] = useState<AdminOverviewCharts | null>(null)
@@ -125,43 +127,42 @@ export const OverviewPage: React.FC = () => {
   }
 
   // --- Ko'rsatkichlarni tayyorlash va umumlashtirish ---
-  const totalUsers = data.total_users ?? 0
-  const newToday = data.new_users_today ?? 0
-  const newThisMonth = data.new_users_this_month ?? 0
-  const dau = data.active_users_today ?? data.dau ?? 0
-  const mau = data.active_users_this_month ?? data.mau ?? 0
-  const retention = data.retention_rate_pct ?? (mau > 0 ? (dau / mau) * 100 : totalUsers > 0 ? (dau / totalUsers) * 100 : 0)
-  const totalTx = data.total_transactions ?? 0
-  const totalReceipts = data.total_receipts_scanned ?? data.total_receipts ?? 0
-  const receiptsToday = data.receipts_scanned_today ?? 0
-  const totalInc = data.total_income_all_time ?? data.total_income ?? 0
-  const totalExp = data.total_expense_all_time ?? data.total_expense ?? 0
+  const totalUsers = Number(data.total_users) || 0
+  const newToday = Number(data.new_users_today) || 0
+  const newThisMonth = Number(data.new_users_this_month) || 0
+  const dau = Number(data.active_users_today ?? data.dau) || 0
+  const mau = Number(data.active_users_this_month ?? data.mau) || 0
+  const retention = Number(data.retention_rate_pct) || (mau > 0 ? (dau / mau) * 100 : totalUsers > 0 ? (dau / totalUsers) * 100 : 0)
+  const totalTx = Number(data.total_transactions) || 0
+  const totalReceipts = Number(data.total_receipts_scanned ?? data.total_receipts) || 0
+  const receiptsToday = Number(data.receipts_scanned_today) || 0
+  const totalInc = Number(data.total_income_all_time ?? data.total_income) || 0
+  const totalExp = Number(data.total_expense_all_time ?? data.total_expense) || 0
   const totalGross = totalInc + totalExp
-  const aiMsgCount = data.ai_message_count ?? 128
-  const aiTxCount = data.ai_transaction_count ?? 42
+  const aiMsgCount = Number(data.ai_message_count) || 128
+  const aiTxCount = Number(data.ai_transaction_count) || 42
 
   // 1. Grouped Bar Chart (Oylik aylanma)
-  const monthNames = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyun', 'Iyul', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek']
-  const monthlyFlow: MonthlyFlowItem[] = React.useMemo(() => {
-    if (chartsData?.monthly_dynamics && chartsData.monthly_dynamics.length > 0) {
-      return chartsData.monthly_dynamics.map(d => ({
-        label: monthNames[(d.month - 1) % 12] || `${d.month}-oy`,
-        income: d.income,
-        expense: d.expense,
-        txCount: d.transaction_count,
-      }))
-    }
+  let monthlyFlow: MonthlyFlowItem[] = []
+  if (chartsData?.monthly_dynamics && chartsData.monthly_dynamics.length > 0) {
+    monthlyFlow = chartsData.monthly_dynamics.map(d => ({
+      label: MONTH_NAMES[(d.month - 1) % 12] || `${d.month}-oy`,
+      income: d.income,
+      expense: d.expense,
+      txCount: d.transaction_count,
+    }))
+  } else {
     const curMonth = new Date().getMonth()
-    return Array.from({ length: 8 }).map((_, idx) => {
+    monthlyFlow = Array.from({ length: 8 }).map((_, idx) => {
       const mIdx = (curMonth - 7 + idx + 12) % 12
       const factor = 0.5 + (idx + 1) * 0.08
       return {
-        label: monthNames[mIdx],
+        label: MONTH_NAMES[mIdx],
         income: Math.round((totalInc / 10) * factor),
         expense: Math.round((totalExp / 10) * factor * 0.85),
       }
     })
-  }, [chartsData?.monthly_dynamics, totalInc, totalExp])
+  }
 
   // 2. Radar Chart (Ekotizim qamrovi)
   let radarData: RadarItem[] = []
@@ -184,23 +185,23 @@ export const OverviewPage: React.FC = () => {
   }
 
   // 3. New Customers Bar Chart
-  const userGrowth: CustomerGrowthItem[] = React.useMemo(() => {
-    if (chartsData?.user_growth && chartsData.user_growth.length > 0) {
-      return chartsData.user_growth.map(ug => ({
-        label: monthNames[(ug.month - 1) % 12] || `${ug.month}`,
-        count: ug.count,
-      }))
-    }
+  let userGrowth: CustomerGrowthItem[] = []
+  if (chartsData?.user_growth && chartsData.user_growth.length > 0) {
+    userGrowth = chartsData.user_growth.map(ug => ({
+      label: MONTH_NAMES[(ug.month - 1) % 12] || `${ug.month}`,
+      count: ug.count,
+    }))
+  } else {
     const curMonth = new Date().getMonth()
-    return Array.from({ length: 8 }).map((_, idx) => {
+    userGrowth = Array.from({ length: 8 }).map((_, idx) => {
       const mIdx = (curMonth - 7 + idx + 12) % 12
       const count = Math.max(1, Math.round((newThisMonth / 2) + Math.sin(idx) * 3 + idx))
       return {
-        label: monthNames[mIdx],
+        label: MONTH_NAMES[mIdx],
         count: count,
       }
     })
-  }, [chartsData?.user_growth, newThisMonth])
+  }
 
   // 4. Account Engagement Donut Chart
   let platformSlices: DonutSlice[] = []
@@ -280,17 +281,17 @@ export const OverviewPage: React.FC = () => {
   if (chartsData?.top_users_ranking && chartsData.top_users_ranking.length > 0) {
     rankingUsers = chartsData.top_users_ranking.map(u => ({
       id: u.user_id,
-      name: u.full_name || u.email,
-      email: u.email,
+      name: u.full_name || u.email || 'Foydalanuvchi',
+      email: u.email || '',
       avatar: u.avatar_url,
       score: formatCompactCurrency(u.total_amount),
       rank: u.rank,
     }))
   } else if (topUsersData?.users && topUsersData.users.length > 0) {
     rankingUsers = topUsersData.users.slice(0, 5).map((u, i) => ({
-      id: u.id ?? u.user_id ?? 0,
-      name: u.full_name || u.email,
-      email: u.email,
+      id: u.id ?? u.user_id ?? (i + 1),
+      name: u.full_name || u.email || 'Foydalanuvchi',
+      email: u.email || '',
       avatar: u.avatar_url,
       score: formatCompactCurrency((u.total_income || 0) + (u.total_expense || 0)),
       rank: i + 1,

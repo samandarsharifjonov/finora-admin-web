@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { PermissionGuard } from './components/PermissionGuard'
+import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { Layout } from './components/layout/Layout'
 
 import { LoginPage } from './pages/LoginPage'
@@ -15,9 +16,19 @@ import { AdminsPage } from './pages/AdminsPage'
 import { TermsPage } from './pages/TermsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
+// Normalize router basename so trailing slash does not break route matching on GitHub Pages
+const rawBase = import.meta.env.BASE_URL || '/'
+const basename = rawBase.length > 1 && rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase
+
 const DashboardRoute: React.FC = () => {
   const { user, hasPermission } = useAuth()
-  if (!user) return null
+  if (!user) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-finora-500 border-t-transparent" />
+      </div>
+    )
+  }
 
   if (user.is_super_admin || hasPermission('overview.view')) {
     return <OverviewPage />
@@ -55,12 +66,13 @@ const DashboardRoute: React.FC = () => {
 
 export function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <Routes>
-            {/* Public Auth Route */}
-            <Route path="/login" element={<LoginPage />} />
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter basename={basename}>
+            <Routes>
+              {/* Public Auth Route */}
+              <Route path="/login" element={<LoginPage />} />
 
             {/* Protected Admin Routes */}
             <Route
@@ -133,7 +145,8 @@ export function App() {
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
-  )
+  </ErrorBoundary>
+)
 }
 
 export default App
