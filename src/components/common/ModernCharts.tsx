@@ -504,10 +504,10 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
         </p>
       </div>
 
-      {/* Gauge SVG graphic - fully visible with generous padding */}
-      <div className="relative my-2 flex flex-col items-center justify-center">
-        <div className="relative flex items-center justify-center">
-          <svg className="w-56 h-[115px]" viewBox="0 0 200 115">
+      {/* Gauge SVG graphic - spacious headroom, overflow-visible */}
+      <div className="relative my-2 flex flex-col items-center justify-center overflow-visible">
+        <div className="relative flex items-center justify-center overflow-visible">
+          <svg className="w-full max-w-[240px] h-[125px] overflow-visible select-none" viewBox="0 0 220 130">
             <defs>
               <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#F59E0B" />
@@ -518,47 +518,47 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
 
             {/* Background Arc */}
             <path
-              d="M 24 100 A 76 76 0 0 1 176 100"
+              d="M 38 110 A 72 72 0 0 1 182 110"
               fill="none"
               stroke="#E2E8F0"
-              strokeWidth="16"
+              strokeWidth="14"
               strokeLinecap="round"
               className="dark:stroke-slate-800"
             />
 
             {/* Gradient Progress Arc */}
             <path
-              d="M 24 100 A 76 76 0 0 1 176 100"
+              d="M 38 110 A 72 72 0 0 1 182 110"
               fill="none"
               stroke={`url(#${gradientId})`}
-              strokeWidth="16"
+              strokeWidth="14"
               strokeLinecap="round"
-              strokeDasharray="238.76"
-              strokeDashoffset={238.76 - (clampedScore / 100) * 238.76}
+              strokeDasharray="226.19"
+              strokeDashoffset={226.19 - (clampedScore / 100) * 226.19}
               className="transition-all duration-1000 ease-out"
             />
 
             {/* Needle Pivot & Indicator inside SVG */}
             <g
-              transform={`rotate(${needleAngle} 100 100)`}
+              transform={`rotate(${needleAngle} 110 110)`}
               style={{
-                transformOrigin: '100px 100px',
+                transformOrigin: '110px 110px',
                 transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
             >
               <line
-                x1="100"
-                y1="100"
-                x2="100"
-                y2="42"
+                x1="110"
+                y1="110"
+                x2="110"
+                y2="52"
                 stroke="currentColor"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 className="text-slate-800 dark:text-white"
               />
             </g>
-            <circle cx="100" cy="100" r="7" className="fill-slate-900 dark:fill-white" />
-            <circle cx="100" cy="100" r="2.5" className="fill-white dark:fill-slate-900" />
+            <circle cx="110" cy="110" r="7" className="fill-slate-900 dark:fill-white" />
+            <circle cx="110" cy="110" r="2.5" className="fill-white dark:fill-slate-900" />
           </svg>
         </div>
 
