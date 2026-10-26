@@ -687,17 +687,26 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
   }
 
   const formatScore = (val: any) => {
-    if (val === null || val === undefined) return '0'
-    if (typeof val === 'number') return val.toLocaleString()
-    return String(val)
+    if (val === null || val === undefined) return '0 ta'
+    if (typeof val === 'number') return `${val.toLocaleString()} ta`
+    const str = String(val).trim()
+    if (!str.includes('ta') && !str.includes("so'm") && !isNaN(Number(str))) {
+      return `${Number(str).toLocaleString()} ta`
+    }
+    return str
   }
 
   return (
     <div className="w-full flex flex-col justify-between h-full">
       <div className="flex items-center justify-between pb-3">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-          {title}
-        </h3>
+        <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            {title}
+          </h3>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            Kunlik amallar va faollik bo'yicha
+          </p>
+        </div>
         <Link
           to="/users"
           className="text-[11px] font-semibold text-finora-700 hover:underline dark:text-finora-400"
@@ -715,8 +724,10 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
             className="flex flex-col items-center group transition-transform hover:-translate-y-1"
           >
             <div className="relative">
-              <UserAvatar src={top2.avatar} name={top2.name} email={top2.email} size="md" />
-              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-300 text-[10px] font-black text-slate-800 shadow border-2 border-white dark:border-dark-card">
+              <div className="rounded-full p-0.5 ring-2 ring-slate-300 ring-offset-2 ring-offset-white dark:ring-offset-dark-card shadow-sm">
+                <UserAvatar src={top2.avatar} name={top2.name} email={top2.email} size="md" shape="circle" />
+              </div>
+              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[10px] font-black text-slate-800 shadow border-2 border-white dark:border-dark-card">
                 2
               </span>
             </div>
@@ -736,8 +747,8 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
             className="flex flex-col items-center group transition-transform hover:-translate-y-1.5 -mt-3"
           >
             <div className="relative">
-              <div className="rounded-full ring-2 ring-amber-400 ring-offset-2 dark:ring-offset-dark-card">
-                <UserAvatar src={top1.avatar} name={top1.name} email={top1.email} size="lg" />
+              <div className="rounded-full p-0.5 ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-dark-card shadow-md">
+                <UserAvatar src={top1.avatar} name={top1.name} email={top1.email} size="lg" shape="circle" />
               </div>
               <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-xs font-black text-amber-950 shadow-md border-2 border-white dark:border-dark-card">
                 👑
@@ -759,7 +770,9 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
             className="flex flex-col items-center group transition-transform hover:-translate-y-1"
           >
             <div className="relative">
-              <UserAvatar src={top3.avatar} name={top3.name} email={top3.email} size="md" />
+              <div className="rounded-full p-0.5 ring-2 ring-amber-700/60 ring-offset-2 ring-offset-white dark:ring-offset-dark-card shadow-sm">
+                <UserAvatar src={top3.avatar} name={top3.name} email={top3.email} size="md" shape="circle" />
+              </div>
               <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-700 text-[10px] font-black text-white shadow border-2 border-white dark:border-dark-card">
                 3
               </span>
@@ -784,7 +797,7 @@ export const PodiumRanking: React.FC<PodiumRankingProps> = ({
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="text-[11px] font-bold text-slate-400 w-3 text-center">{u?.rank || i + 4}</span>
-              <UserAvatar src={u?.avatar} name={u?.name} email={u?.email} size="sm" />
+              <UserAvatar src={u?.avatar} name={u?.name} email={u?.email} size="sm" shape="circle" />
               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
                 {u?.name || 'Foydalanuvchi'}
               </span>

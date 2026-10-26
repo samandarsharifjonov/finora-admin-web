@@ -69,9 +69,9 @@ export const OverviewPage: React.FC = () => {
       // 3. Qurilmalar taqsimoti
       const devicesPromise = apiRequest<DevicesAnalyticsData>('/admin/analytics/devices').catch(() => null)
 
-      // 4. Eng faol top foydalanuvchilar
+      // 4. Eng faol top foydalanuvchilar (muntazam va kunlik amallar bo'yicha)
       const usersPromise = apiRequest<AdminUserListResponse>('/admin/users', {
-        params: { limit: 5, sort_by: 'money' },
+        params: { limit: 5, sort_by: 'transactions' },
       }).catch(() => null)
 
       const [resOverview, resCharts, resDevices, resUsers] = await Promise.all([
@@ -276,7 +276,7 @@ export const OverviewPage: React.FC = () => {
     }))
   }
 
-  // 7. Top Users Podium Ranking
+  // 7. Top Users Podium Ranking (Faollik va kiritilgan amallar soni bo'yicha)
   let rankingUsers: PodiumUser[] = []
   if (chartsData?.top_users_ranking && chartsData.top_users_ranking.length > 0) {
     rankingUsers = chartsData.top_users_ranking.map(u => ({
@@ -284,7 +284,7 @@ export const OverviewPage: React.FC = () => {
       name: u.full_name || u.email || 'Foydalanuvchi',
       email: u.email || '',
       avatar: u.avatar_url,
-      score: formatCompactCurrency(u.total_amount),
+      score: `${(u.transaction_count || 0).toLocaleString()} ta`,
       rank: u.rank,
     }))
   } else if (topUsersData?.users && topUsersData.users.length > 0) {
@@ -293,16 +293,16 @@ export const OverviewPage: React.FC = () => {
       name: u.full_name || u.email || 'Foydalanuvchi',
       email: u.email || '',
       avatar: u.avatar_url,
-      score: formatCompactCurrency((u.total_income || 0) + (u.total_expense || 0)),
+      score: `${(u.transaction_count || 0).toLocaleString()} ta`,
       rank: i + 1,
     }))
   } else {
     rankingUsers = [
-      { id: 1, name: 'Kate Bush', email: 'kate@example.com', avatar: null, score: '4,950', rank: 1 },
-      { id: 2, name: 'Amy Lee', email: 'amy@example.com', avatar: null, score: '3,010', rank: 2 },
-      { id: 3, name: 'Yuge Bai', email: 'yuge@example.com', avatar: null, score: '2,800', rank: 3 },
-      { id: 4, name: 'Andy Bonillo', email: 'andy@example.com', avatar: null, score: '2,610', rank: 4 },
-      { id: 5, name: 'Samandar Sh.', email: 'admin@finora.uz', avatar: null, score: '2,450', rank: 5 },
+      { id: 1, name: 'Kate Bush', email: 'kate@example.com', avatar: null, score: '428 ta', rank: 1 },
+      { id: 2, name: 'Amy Lee', email: 'amy@example.com', avatar: null, score: '312 ta', rank: 2 },
+      { id: 3, name: 'Yuge Bai', email: 'yuge@example.com', avatar: null, score: '280 ta', rank: 3 },
+      { id: 4, name: 'Andy Bonillo', email: 'andy@example.com', avatar: null, score: '245 ta', rank: 4 },
+      { id: 5, name: 'Samandar Sh.', email: 'admin@finora.uz', avatar: null, score: '210 ta', rank: 5 },
     ]
   }
 
