@@ -5,10 +5,34 @@ import { apiRequest } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000 // 5 daqiqa (millisekundda)
+const STORAGE_LOCKED_KEY = 'finora_screen_locked'
+const STORAGE_LAST_ACTIVITY_KEY = 'finora_last_activity'
 
 export const AutoLockOverlay: React.FC = () => {
   const { user, logout, login } = useAuth()
-  const [isLocked, setIsLocked] = useState(false)
+
+  const getInitialLockState = (): boolean => {
+    try {
+      if (
+        sessionStorage.getItem(STORAGE_LOCKED_KEY) === 'true' ||
+        localStorage.getItem(STORAGE_LOCKED_KEY) === 'true'
+      ) {
+        return true
+      }
+      const lastActiveStr = localStorage.getItem(STORAGE_LAST_ACTIVITY_KEY)
+      if (lastActiveStr) {
+        const lastActive = parseInt(lastActiveStr, 10)
+        if (!isNaN(lastActive) && Date.now() - lastActive >= INACTIVITY_TIMEOUT) {
+          sessionStorage.setItem(STORAGE_LOCKED_KEY, 'true')
+          localStorage.setItem(STORAGE_LOCKED_KEY, 'true')
+          return true
+        }
+      }
+    } catch (_) {}
+    return false
+  }
+
+  const [isLocked, setIsLocked] = useState<boolean>(getInitialLockState)
   const [qrToken, setQrToken] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState(60)
   const [isExpired, setIsExpired] = useState(false)
@@ -23,23 +47,65 @@ export const AutoLockOverlay: React.FC = () => {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lastActivityRef = useRef<number>(Date.now())
-
-  // Reset activity timer
-  const resetTimer = () => {
-    lastActivityRef.current = Date.now()
-    if (isLocked) return // Don't reset if already locked
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      lockScreen()
-    }, INACTIVITY_TIMEOUT)
-  }
+  const lastSavedActivityRef = useRef<number>(Date.now())
 
   const lockScreen = () => {
+    try {
+      sessionStorage.setItem(STORAGE_LOCKED_KEY, 'true')
+      localStorage.setItem(STORAGE_LOCKED_KEY, 'true')
+    } catch (_) {}
     setIsLocked(true)
     setShowPasswordInput(false)
     setPassword('')
     setPasswordError(null)
     generateQr()
+  }
+
+  const unlockScreen = () => {
+    try {
+      sessionStorage.removeItem(STORAGE_LOCKED_KEY)
+      localStorage.removeItem(STORAGE_LOCKED_KEY)
+      const now = Date.now()
+      localStorage.setItem(STORAGE_LAST_ACTIVITY_KEY, now.toString())
+      lastActivityRef.current = now
+      lastSavedActivityRef.current = now
+    } catch (_) {}
+    setIsLocked(false)
+    setIsSuccess(false)
+    setQrToken(null)
+    setPassword('')
+    setPasswordError(null)
+    setShowPasswordInput(false)
+    resetTimer()
+  }
+
+  // Reset activity timer
+  const resetTimer = () => {
+    try {
+      if (
+        sessionStorage.getItem(STORAGE_LOCKED_KEY) === 'true' ||
+        localStorage.getItem(STORAGE_LOCKED_KEY) === 'true'
+      ) {
+        return
+      }
+    } catch (_) {}
+    if (isLocked) return
+
+    const now = Date.now()
+    lastActivityRef.current = now
+
+    // Throttle localStorage updates to once every 3 seconds
+    if (now - lastSavedActivityRef.current > 3000) {
+      lastSavedActivityRef.current = now
+      try {
+        localStorage.setItem(STORAGE_LAST_ACTIVITY_KEY, now.toString())
+      } catch (_) {}
+    }
+
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      lockScreen()
+    }, INACTIVITY_TIMEOUT)
   }
 
   // Generate QR session for unlocking
@@ -57,14 +123,43 @@ export const AutoLockOverlay: React.FC = () => {
     }
   }
 
+  // Ensure QR is generated if page loaded in locked state
+  useEffect(() => {
+    if (isLocked && !qrToken && !showPasswordInput) {
+      generateQr()
+    }
+  }, [isLocked])
+
   // Activity event listeners & tab visibility handling
   useEffect(() => {
+    if (isLocked) return
+
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll']
     const handler = () => resetTimer()
 
     const onVisibilityOrFocusChange = () => {
-      if (isLocked) return
-      const elapsed = Date.now() - lastActivityRef.current
+      try {
+        if (
+          sessionStorage.getItem(STORAGE_LOCKED_KEY) === 'true' ||
+          localStorage.getItem(STORAGE_LOCKED_KEY) === 'true'
+        ) {
+          lockScreen()
+          return
+        }
+      } catch (_) {}
+
+      let lastActive = lastActivityRef.current
+      try {
+        const stored = localStorage.getItem(STORAGE_LAST_ACTIVITY_KEY)
+        if (stored) {
+          const parsed = parseInt(stored, 10)
+          if (!isNaN(parsed)) {
+            lastActive = Math.max(lastActive, parsed)
+          }
+        }
+      } catch (_) {}
+
+      const elapsed = Date.now() - lastActive
       if (elapsed >= INACTIVITY_TIMEOUT) {
         lockScreen()
       } else {
@@ -75,17 +170,53 @@ export const AutoLockOverlay: React.FC = () => {
       }
     }
 
+    // Storage event listener for multi-tab synchronization
+    const onStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_LOCKED_KEY) {
+        if (e.newValue === 'true') {
+          setIsLocked(true)
+          generateQr()
+        } else if (!e.newValue) {
+          setIsLocked(false)
+          setIsSuccess(false)
+          setQrToken(null)
+          resetTimer()
+        }
+      }
+    }
+
+    // Periodic check interval (every 5 seconds) to catch idle timeout even if browser suspends setTimeout
+    const intervalId = setInterval(() => {
+      let lastActive = lastActivityRef.current
+      try {
+        const stored = localStorage.getItem(STORAGE_LAST_ACTIVITY_KEY)
+        if (stored) {
+          const parsed = parseInt(stored, 10)
+          if (!isNaN(parsed)) {
+            lastActive = Math.max(lastActive, parsed)
+          }
+        }
+      } catch (_) {}
+
+      if (Date.now() - lastActive >= INACTIVITY_TIMEOUT) {
+        lockScreen()
+      }
+    }, 5000)
+
     events.forEach(evt => window.addEventListener(evt, handler, { passive: true }))
     document.addEventListener('visibilitychange', onVisibilityOrFocusChange)
     window.addEventListener('focus', onVisibilityOrFocusChange)
+    window.addEventListener('storage', onStorageChange)
 
     resetTimer()
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
+      clearInterval(intervalId)
       events.forEach(evt => window.removeEventListener(evt, handler))
       document.removeEventListener('visibilitychange', onVisibilityOrFocusChange)
       window.removeEventListener('focus', onVisibilityOrFocusChange)
+      window.removeEventListener('storage', onStorageChange)
     }
   }, [isLocked])
 
@@ -119,10 +250,7 @@ export const AutoLockOverlay: React.FC = () => {
         if (res.status === 'confirmed') {
           setIsSuccess(true)
           setTimeout(() => {
-            setIsLocked(false)
-            setIsSuccess(false)
-            setQrToken(null)
-            resetTimer()
+            unlockScreen()
           }, 800)
         } else if (res.status === 'expired') {
           setIsExpired(true)
@@ -146,14 +274,21 @@ export const AutoLockOverlay: React.FC = () => {
 
     try {
       await login(user.email, password)
-      setIsLocked(false)
-      setPassword('')
-      resetTimer()
+      unlockScreen()
     } catch (err: any) {
       setPasswordError(err?.message || "Parol noto'g'ri kiritildi")
     } finally {
       setIsUnlocking(false)
     }
+  }
+
+  const handleLogout = () => {
+    try {
+      sessionStorage.removeItem(STORAGE_LOCKED_KEY)
+      localStorage.removeItem(STORAGE_LOCKED_KEY)
+      localStorage.removeItem(STORAGE_LAST_ACTIVITY_KEY)
+    } catch (_) {}
+    logout()
   }
 
   if (!isLocked) return null
@@ -278,7 +413,7 @@ export const AutoLockOverlay: React.FC = () => {
         {/* Logout button */}
         <div className="mt-6 pt-4 border-t border-slate-100 dark:border-dark-border">
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="flex items-center justify-center gap-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 mx-auto"
           >
             <LogOut className="h-3.5 w-3.5" /> Butunlay tizimdan chiqish

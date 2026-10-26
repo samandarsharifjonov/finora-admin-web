@@ -78,6 +78,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Kechirasiz, sizga Admin panelga kirish ruxsati berilmagan!")
       }
 
+      try {
+        sessionStorage.removeItem('finora_screen_locked')
+        localStorage.removeItem('finora_screen_locked')
+        localStorage.setItem('finora_last_activity', Date.now().toString())
+      } catch (_) {}
+
       setToken(token)
       setTokenState(token)
       setUser(user)
@@ -91,6 +97,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!hasAdminPanelAccess) {
       throw new Error("Kechirasiz, sizga Admin panelga kirish ruxsati berilmagan!")
     }
+    try {
+      sessionStorage.removeItem('finora_screen_locked')
+      localStorage.removeItem('finora_screen_locked')
+      localStorage.setItem('finora_last_activity', Date.now().toString())
+    } catch (_) {}
     setToken(token)
     setTokenState(token)
     setUser(user)
@@ -98,6 +109,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     removeToken()
+    try {
+      sessionStorage.removeItem('finora_screen_locked')
+      localStorage.removeItem('finora_screen_locked')
+      localStorage.removeItem('finora_last_activity')
+    } catch (_) {}
     setTokenState(null)
     setUser(null)
   }
