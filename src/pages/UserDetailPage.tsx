@@ -22,7 +22,7 @@ import {
 import { apiRequest } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import type { AdminUserDetail } from '../types'
-import { formatCurrency, formatCompactCurrency, formatDate } from '../lib/utils'
+import { formatCurrency, formatCompactCurrency, formatCurrencyParts, formatDate } from '../lib/utils'
 import { UserAvatar } from '../components/common/UserAvatar'
 import {
   SparklineChart,
@@ -293,6 +293,20 @@ export const UserDetailPage: React.FC = () => {
         { name: 'Mobil ilova', value: 1, color: '#3B82F6' },
       ]
 
+  const renderCardMoney = (amount: number | string | undefined | null, colorClass: string) => {
+    const { value, unit } = formatCurrencyParts(amount)
+    return (
+      <div className={`flex items-baseline gap-1 whitespace-nowrap min-w-0 ${colorClass}`}>
+        <span className="text-xl sm:text-[21px] xl:text-[23px] font-black tracking-tight truncate">
+          {value}
+        </span>
+        <span className="text-[11px] font-bold opacity-75 uppercase tracking-tight shrink-0">
+          {unit}
+        </span>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Top bar with back button & refresh */}
@@ -421,18 +435,17 @@ export const UserDetailPage: React.FC = () => {
               <Wallet className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                {formatCurrency(user.balance ?? 0)}
-              </div>
-              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                <TrendingUp className="h-3.5 w-3.5" />
-                {(user.balance ?? 0) >= 0 ? 'Ijobiy qoldiq' : 'Taqchillik'}
+          <div className="mt-3 flex items-center justify-between gap-2 min-w-0">
+            <div className="min-w-0 flex-1">
+              {renderCardMoney(user.balance ?? 0, 'text-slate-900 dark:text-white')}
+              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 truncate">
+                <TrendingUp className="h-3.5 w-3.5 shrink-0" />
+                <span>{(user.balance ?? 0) >= 0 ? 'Ijobiy qoldiq' : 'Taqchillik'}</span>
               </div>
             </div>
             <SparklineChart
               data={balanceSparkline}
+              width={56}
               isPositive={(user.balance ?? 0) >= 0}
               color={(user.balance ?? 0) >= 0 ? '#10B981' : '#F43F5E'}
             />
@@ -453,16 +466,15 @@ export const UserDetailPage: React.FC = () => {
               <ArrowDownRight className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(user.total_income ?? 0)}
-              </div>
-              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                <Check className="h-3.5 w-3.5" /> Tushumlar oqimi
+          <div className="mt-3 flex items-center justify-between gap-2 min-w-0">
+            <div className="min-w-0 flex-1">
+              {renderCardMoney(user.total_income ?? 0, 'text-emerald-600 dark:text-emerald-400')}
+              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 truncate">
+                <Check className="h-3.5 w-3.5 shrink-0" />
+                <span>Tushumlar oqimi</span>
               </div>
             </div>
-            <SparklineChart data={incomeSparkline} isPositive={true} color="#10B981" />
+            <SparklineChart data={incomeSparkline} width={56} isPositive={true} color="#10B981" />
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-[10.5px] text-slate-500 dark:border-dark-border/60 dark:text-slate-400">
             <span>Oxirgi 12 oy:</span>
@@ -482,16 +494,14 @@ export const UserDetailPage: React.FC = () => {
               <ArrowUpRight className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-black tracking-tight text-rose-600 dark:text-rose-400">
-                {formatCurrency(user.total_expense ?? 0)}
-              </div>
-              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                {user.transaction_count ?? 0} ta tranzaksiya
+          <div className="mt-3 flex items-center justify-between gap-2 min-w-0">
+            <div className="min-w-0 flex-1">
+              {renderCardMoney(user.total_expense ?? 0, 'text-rose-600 dark:text-rose-400')}
+              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 truncate">
+                <span>{user.transaction_count ?? 0} ta tranzaksiya</span>
               </div>
             </div>
-            <SparklineChart data={expenseSparkline} isPositive={false} color="#F59E0B" />
+            <SparklineChart data={expenseSparkline} width={56} isPositive={false} color="#F59E0B" />
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-[10.5px] text-slate-500 dark:border-dark-border/60 dark:text-slate-400">
             <span>Soliq cheklari:</span>
@@ -509,17 +519,21 @@ export const UserDetailPage: React.FC = () => {
               <Sparkles className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                {user.ai_message_count ?? 0}
-                <span className="text-xs text-slate-400 ml-1 font-normal">xabar</span>
+          <div className="mt-3 flex items-center justify-between gap-2 min-w-0">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline gap-1 whitespace-nowrap min-w-0 text-slate-900 dark:text-white">
+                <span className="text-xl sm:text-[21px] xl:text-[23px] font-black tracking-tight truncate">
+                  {user.ai_message_count ?? 0}
+                </span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-tight shrink-0">
+                  xabar
+                </span>
               </div>
-              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-purple-600 dark:text-purple-400">
-                +{user.ai_transaction_count ?? 0} ta AI amal
+              <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-purple-600 dark:text-purple-400 truncate">
+                <span>+{user.ai_transaction_count ?? 0} ta AI amal</span>
               </div>
             </div>
-            <SparklineChart data={aiSparkline} color="#8B5CF6" />
+            <SparklineChart data={aiSparkline} width={56} color="#8B5CF6" />
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-[10.5px] text-slate-500 dark:border-dark-border/60 dark:text-slate-400">
             <span>Do'stlar tarmog'i:</span>

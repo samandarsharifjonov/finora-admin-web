@@ -7,11 +7,23 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: number | string | undefined | null): string {
   const num = typeof amount === 'number' ? amount : Number(amount)
-  if (amount === undefined || amount === null || isNaN(num)) return "0 so'm"
+  if (amount === undefined || amount === null || isNaN(num)) return "0\u00A0so'm"
   return new Intl.NumberFormat('uz-UZ', {
     style: 'decimal',
     maximumFractionDigits: 0,
-  }).format(num) + " so'm"
+  }).format(num) + "\u00A0so'm"
+}
+
+export function formatCurrencyParts(amount: number | string | undefined | null): { value: string; unit: string } {
+  const num = typeof amount === 'number' ? amount : Number(amount)
+  if (amount === undefined || amount === null || isNaN(num)) {
+    return { value: '0', unit: "so'm" }
+  }
+  const formatted = new Intl.NumberFormat('uz-UZ', {
+    style: 'decimal',
+    maximumFractionDigits: 0,
+  }).format(num)
+  return { value: formatted, unit: "so'm" }
 }
 
 export function formatCompactCurrency(amount: number | string | undefined | null): string {

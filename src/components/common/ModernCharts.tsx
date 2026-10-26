@@ -27,6 +27,7 @@ interface SparklineChartProps {
   data?: number[]
   color?: string
   height?: number
+  width?: number | string
   isPositive?: boolean
 }
 
@@ -34,6 +35,7 @@ export const SparklineChart: React.FC<SparklineChartProps> = ({
   data = [],
   color,
   height = 36,
+  width = 60,
   isPositive = true,
 }) => {
   const chartColor = color || (isPositive ? '#10B981' : '#F43F5E')
@@ -41,9 +43,10 @@ export const SparklineChart: React.FC<SparklineChartProps> = ({
   const chartData = safeData.map((val, idx) => ({ idx, val: typeof val === 'number' && !isNaN(val) ? val : 0 }))
   const uniqueId = React.useId()
   const gradientId = `sparkline-grad-${uniqueId.replace(/:/g, '')}`
+  const widthStyle = typeof width === 'number' ? `${width}px` : width
 
   return (
-    <div style={{ height: `${height}px`, width: '84px' }} className="shrink-0 overflow-hidden">
+    <div style={{ height: `${height}px`, width: widthStyle }} className="shrink-0 overflow-hidden">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
           <defs>
@@ -454,13 +457,41 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
   score = 84.6,
   title = "Foydalanuvchilar Sodiqligi",
   subtitle = "Faollik va sodiqlik indeksi (NPS)",
-  badgeLabel = "Yuqori sodiqlik",
+  badgeLabel,
   breakdown = [],
 }) => {
   const numScore = typeof score === 'number' && !isNaN(score) ? score : 84.6
   const clampedScore = Math.min(100, Math.max(0, numScore))
   const needleAngle = (clampedScore / 100) * 180 - 90
   const safeBreakdown = Array.isArray(breakdown) ? breakdown : []
+  const uniqueId = React.useId().replace(/:/g, '')
+  const gradientId = `gauge-gradient-${uniqueId}`
+
+  // Dynamic badge text and color based on score
+  const badgeConfig = badgeLabel
+    ? {
+        text: badgeLabel,
+        color:
+          clampedScore >= 70
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
+            : clampedScore >= 40
+            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
+            : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
+      }
+    : clampedScore >= 70
+    ? {
+        text: 'Yuqori sodiqlik',
+        color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400',
+      }
+    : clampedScore >= 40
+    ? {
+        text: "O'rtacha faollik",
+        color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400',
+      }
+    : {
+        text: 'Past faollik',
+        color: 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
+      }
 
   return (
     <div className="w-full flex flex-col justify-between h-full">
@@ -473,48 +504,65 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
         </p>
       </div>
 
-      {/* Gauge SVG graphic */}
-      <div className="relative my-3 flex flex-col items-center justify-center">
-        <div className="relative h-28 w-52 overflow-hidden flex items-end justify-center">
-          <svg className="h-48 w-48 -mb-4" viewBox="0 0 100 50">
-            {/* Background Arc */}
-            <path
-              d="M 10 50 A 40 40 0 0 1 90 50"
-              fill="none"
-              stroke="#E2E8F0"
-              strokeWidth="11"
-              strokeLinecap="round"
-              className="dark:stroke-slate-800"
-            />
-            {/* Gradient Arc */}
+      {/* Gauge SVG graphic - fully visible with generous padding */}
+      <div className="relative my-2 flex flex-col items-center justify-center">
+        <div className="relative flex items-center justify-center">
+          <svg className="w-56 h-[115px]" viewBox="0 0 200 115">
             <defs>
-              <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#F59E0B" />
                 <stop offset="50%" stopColor="#3B82F6" />
                 <stop offset="100%" stopColor="#10B981" />
               </linearGradient>
             </defs>
+
+            {/* Background Arc */}
             <path
-              d="M 10 50 A 40 40 0 0 1 90 50"
+              d="M 24 100 A 76 76 0 0 1 176 100"
               fill="none"
-              stroke="url(#gaugeGradient)"
-              strokeWidth="11"
+              stroke="#E2E8F0"
+              strokeWidth="16"
               strokeLinecap="round"
-              strokeDasharray="125.6"
-              strokeDashoffset={125.6 - (clampedScore / 100) * 125.6}
+              className="dark:stroke-slate-800"
+            />
+
+            {/* Gradient Progress Arc */}
+            <path
+              d="M 24 100 A 76 76 0 0 1 176 100"
+              fill="none"
+              stroke={`url(#${gradientId})`}
+              strokeWidth="16"
+              strokeLinecap="round"
+              strokeDasharray="238.76"
+              strokeDashoffset={238.76 - (clampedScore / 100) * 238.76}
               className="transition-all duration-1000 ease-out"
             />
-          </svg>
 
-          {/* Needle / indicator */}
-          <div
-            className="absolute bottom-0 h-14 w-1 bg-slate-800 dark:bg-white rounded-full origin-bottom transition-transform duration-700"
-            style={{ transform: `rotate(${needleAngle}deg)` }}
-          />
-          <div className="absolute bottom-[-4px] h-3.5 w-3.5 rounded-full bg-slate-900 dark:bg-white border-2 border-white dark:border-dark-card" />
+            {/* Needle Pivot & Indicator inside SVG */}
+            <g
+              transform={`rotate(${needleAngle} 100 100)`}
+              style={{
+                transformOrigin: '100px 100px',
+                transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              }}
+            >
+              <line
+                x1="100"
+                y1="100"
+                x2="100"
+                y2="42"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                className="text-slate-800 dark:text-white"
+              />
+            </g>
+            <circle cx="100" cy="100" r="7" className="fill-slate-900 dark:fill-white" />
+            <circle cx="100" cy="100" r="2.5" className="fill-white dark:fill-slate-900" />
+          </svg>
         </div>
 
-        <div className="mt-2 text-center">
+        <div className="mt-1 text-center">
           <div className="flex items-baseline justify-center gap-1">
             <span className="text-2xl font-black text-slate-900 dark:text-white">
               {numScore.toFixed(1)}
@@ -523,8 +571,8 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
               Ball
             </span>
           </div>
-          <span className="inline-block rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 mt-0.5">
-            {badgeLabel}
+          <span className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold mt-0.5 ${badgeConfig.color}`}>
+            {badgeConfig.text}
           </span>
         </div>
       </div>
