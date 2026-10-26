@@ -36,6 +36,11 @@ interface RequestOptions extends RequestInit {
 }
 
 export async function apiRequest<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+  // Security: prevent protocol injection or path traversal
+  if (endpoint.includes('://') || endpoint.includes('../') || endpoint.includes('..\\')) {
+    throw new Error("Xavfsizlik qoidasi buzildi: Yaroqsiz API endpoint")
+  }
+
   const baseUrl = getBaseApiUrl().replace(/\/+$/, '')
   let url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`
 
@@ -84,7 +89,11 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestOpti
   }
 
   if (!response.ok) {
-    const errorMsg = resJson?.error || resJson?.message || `Xatolik: ${response.status} ${response.statusText}`
+    let errorMsg = resJson?.error || resJson?.message || `Server xatosi: ${response.status}`
+    // Mask raw database errors to prevent technical reconnaissance
+    if (typeof errorMsg === 'string' && (errorMsg.includes('pq:') || errorMsg.includes('SQL') || errorMsg.includes('syntax error'))) {
+      errorMsg = "Serverda so'rovni bajarishda xatolik yuz berdi"
+    }
     throw new Error(errorMsg)
   }
 

@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { Lock, RefreshCw, LogOut, CheckCircle2, ShieldCheck, KeyRound } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
+import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../../lib/security'
 
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000 // 5 daqiqa (millisekundda)
 const STORAGE_LOCKED_KEY = 'finora_screen_locked'
@@ -266,17 +267,49 @@ export const AutoLockOverlay: React.FC = () => {
     }
   }, [isLocked, qrToken, isExpired, isSuccess])
 
+  // Brute-force cooldown protection on screen unlock
+  const [cooldownSeconds, setCooldownSeconds] = useState(() => {
+    const { remainingSeconds } = checkRateLimit('screen_unlock')
+    return remainingSeconds
+  })
+
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return
+    const timer = setInterval(() => {
+      setCooldownSeconds(prev => {
+        if (prev <= 1) return 0
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [cooldownSeconds])
+
   const handlePasswordUnlock = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!password.trim() || !user?.email) return
+
+    if (cooldownSeconds > 0) {
+      setPasswordError(`Xavfsizlik blokirovkasi: Iltimos, ${cooldownSeconds} soniya kuting.`)
+      return
+    }
+
     setIsUnlocking(true)
     setPasswordError(null)
 
     try {
       await login(user.email, password)
+      resetRateLimit('screen_unlock')
       unlockScreen()
     } catch (err: any) {
-      setPasswordError(err?.message || "Parol noto'g'ri kiritildi")
+      const { isLocked, remainingSeconds, attempts } = recordFailedAttempt('screen_unlock')
+      if (isLocked) {
+        setCooldownSeconds(remainingSeconds)
+        setPasswordError(`Ko'p marta xato parol kiritildi (${attempts} ta). Tizim ${remainingSeconds} soniyaga qulflandi.`)
+      } else {
+        const remainingAttempts = 5 - attempts
+        const warn = remainingAttempts > 0 && remainingAttempts <= 3 ? ` (Qolgan urinishlar: ${remainingAttempts} ta)` : ''
+        setPasswordError((err?.message || "Parol noto'g'ri kiritildi") + warn)
+      }
     } finally {
       setIsUnlocking(false)
     }
@@ -294,7 +327,7 @@ export const AutoLockOverlay: React.FC = () => {
   if (!isLocked) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-xl p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/98 backdrop-blur-3xl p-4 select-none animate-in fade-in duration-300">
       <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/95 p-6 shadow-2xl backdrop-blur-2xl dark:border-dark-border dark:bg-dark-card/95 sm:p-8 text-center">
         {/* Lock icon */}
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-finora-500/15 border border-finora-500/30 text-finora-600 dark:text-finora-400">
@@ -368,11 +401,21 @@ export const AutoLockOverlay: React.FC = () => {
         ) : (
           /* Password Unlock Mode */
           <form onSubmit={handlePasswordUnlock} className="mt-5 space-y-3.5 text-left">
-            {passwordError && (
+            {cooldownSeconds > 0 ? (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-2.5 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200 animate-pulse">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <span>Xavfsizlik blokirovkasi</span>
+                </div>
+                <p className="text-[11px] opacity-90 mt-1">
+                  Ko'p marta xato kiritildi. Qayta urinish: <strong>{cooldownSeconds} soniya</strong>
+                </p>
+              </div>
+            ) : passwordError ? (
               <div className="rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-xs font-semibold text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
                 {passwordError}
               </div>
-            )}
+            ) : null}
 
             <div>
               <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
@@ -381,20 +424,21 @@ export const AutoLockOverlay: React.FC = () => {
               <input
                 type="password"
                 value={password}
+                disabled={cooldownSeconds > 0}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 autoFocus
-                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-finora-500 focus:bg-white dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-finora-500 focus:bg-white dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white disabled:opacity-50"
               />
             </div>
 
             <button
               type="submit"
-              disabled={isUnlocking}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-finora-500 py-2.5 text-xs font-bold text-slate-950 shadow-sm hover:bg-finora-600 disabled:opacity-60"
+              disabled={isUnlocking || cooldownSeconds > 0}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-finora-500 py-2.5 text-xs font-bold text-slate-950 shadow-sm hover:bg-finora-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isUnlocking ? 'Tekshirilmoqda...' : 'Ekranni ochish'}
+              {isUnlocking ? 'Tekshirilmoqda...' : cooldownSeconds > 0 ? `Qayta urinish: ${cooldownSeconds}s` : 'Ekranni ochish'}
             </button>
 
             <button

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { apiRequest } from '../lib/api'
+import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../lib/security'
 import type { User } from '../types'
 
 interface QRGenerateResponse {
@@ -159,17 +160,50 @@ export const LoginPage: React.FC = () => {
     }
   }, [authMode, qrToken, isQrExpired, isQrSuccess])
 
-  // Password login handler
+  // Brute-force cooldown protection
+  const [cooldownSeconds, setCooldownSeconds] = useState(() => {
+    const { remainingSeconds } = checkRateLimit('login_password')
+    return remainingSeconds
+  })
+
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return
+    const timer = setInterval(() => {
+      setCooldownSeconds(prev => {
+        if (prev <= 1) return 0
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [cooldownSeconds])
+
+  // Password login handler with military-grade rate limiting
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (cooldownSeconds > 0) {
+      setPasswordError(`Xavfsizlik blokirovkasi faol: Iltimos, ${cooldownSeconds} soniya kuting.`)
+      return
+    }
+
     setPasswordError(null)
     setPasswordLoading(true)
 
     try {
       await login(email.trim(), password)
+      resetRateLimit('login_password')
       navigate('/', { replace: true })
     } catch (err: any) {
-      setPasswordError(err?.message || "Tizimga kirishda xatolik yuz berdi")
+      const { isLocked, remainingSeconds, attempts } = recordFailedAttempt('login_password')
+      if (isLocked) {
+        setCooldownSeconds(remainingSeconds)
+        setPasswordError(`Ko'p marta xato parol kiritildi (${attempts} ta). Xavfsizlik uchun tizim ${remainingSeconds} soniyaga bloklandi.`)
+      } else {
+        const remainingAttempts = 5 - attempts
+        const attemptsWarning = remainingAttempts > 0 && remainingAttempts <= 3 
+          ? ` (Qolgan urinishlar: ${remainingAttempts} ta)` 
+          : ''
+        setPasswordError((err?.message || "Tizimga kirishda xatolik yuz berdi") + attemptsWarning)
+      }
     } finally {
       setPasswordLoading(false)
     }
@@ -297,12 +331,22 @@ export const LoginPage: React.FC = () => {
           {/* MODE 2: Password Login (Backup fallback) */}
           {authMode === 'password' && (
             <div className="mt-6">
-              {passwordError && (
+              {cooldownSeconds > 0 ? (
+                <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200 animate-pulse">
+                  <ShieldCheck className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-bold">Xavfsizlik blokirovkasi yoqildi</p>
+                    <p className="text-[11px] opacity-90 mt-0.5">
+                      Ketma-ket xato urinishlar sababli tizim vaqtincha to'xtatildi. Qayta urinish: <strong>{cooldownSeconds} soniya</strong>
+                    </p>
+                  </div>
+                </div>
+              ) : passwordError ? (
                 <div className="mb-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
                   <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
                   <div className="flex-1 font-medium">{passwordError}</div>
                 </div>
-              )}
+              ) : null}
 
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 <div>
@@ -316,11 +360,12 @@ export const LoginPage: React.FC = () => {
                     <input
                       type="email"
                       value={email}
+                      disabled={cooldownSeconds > 0}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="admin@finora.uz"
                       required
                       autoFocus
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-3.5 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-3.5 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -336,10 +381,11 @@ export const LoginPage: React.FC = () => {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
+                      disabled={cooldownSeconds > 0}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-10 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-10 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -360,6 +406,7 @@ export const LoginPage: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={rememberMe}
+                      disabled={cooldownSeconds > 0}
                       onChange={e => setRememberMe(e.target.checked)}
                       className="h-4 w-4 rounded border-slate-300 text-finora-600 focus:ring-finora-500/20 dark:border-dark-border dark:bg-dark-cardSecondary"
                     />
@@ -374,14 +421,16 @@ export const LoginPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  disabled={passwordLoading}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-finora-500/25 transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-60"
+                  disabled={passwordLoading || cooldownSeconds > 0}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-finora-500/25 transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {passwordLoading ? (
                     <div className="flex items-center gap-2">
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
                       <span>Tekshirilmoqda...</span>
                     </div>
+                  ) : cooldownSeconds > 0 ? (
+                    <span>Bloklandi ({cooldownSeconds}s)</span>
                   ) : (
                     <>
                       <span>Tizimga kirish</span>
