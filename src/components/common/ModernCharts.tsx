@@ -77,10 +77,17 @@ export interface MonthlyFlowItem {
 
 interface GroupedBarChartProps {
   data?: MonthlyFlowItem[]
+  title?: string
+  subtitle?: string
   height?: number
 }
 
-export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data = [], height = 240 }) => {
+export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({
+  data = [],
+  title = "Oylik moliyaviy oqim",
+  subtitle = "Kirim va Chiqim balansi",
+  height = 240,
+}) => {
   const safeData = Array.isArray(data) ? data : []
 
   return (
@@ -88,10 +95,10 @@ export const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data = [], hei
       <div className="flex items-center justify-between pb-3">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-            Oylik moliyaviy oqim
+            {title}
           </h3>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Kirim va Chiqim balansi
+            {subtitle}
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs font-semibold">
@@ -178,10 +185,17 @@ export interface RadarItem {
 
 interface EcosystemRadarProps {
   data?: RadarItem[]
+  title?: string
+  subtitle?: string
   height?: number
 }
 
-export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({ data = [], height = 240 }) => {
+export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({
+  data = [],
+  title = "Finora Ekotizim Tahlili",
+  subtitle = "Funksiyalar va qamrov indeksi",
+  height = 240,
+}) => {
   const safeData = Array.isArray(data) ? data : []
 
   return (
@@ -189,10 +203,10 @@ export const EcosystemRadarChart: React.FC<EcosystemRadarProps> = ({ data = [], 
       <div className="flex items-center justify-between pb-2">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-            Finora Ekotizim Tahlili
+            {title}
           </h3>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Funksiyalar va qamrov indeksi
+            {subtitle}
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs font-semibold">
@@ -327,16 +341,22 @@ export interface DonutSlice {
 
 interface EngagementDonutProps {
   data?: DonutSlice[]
+  title?: string
+  subtitle?: string
   totalLabel?: string
   totalCount?: number
   height?: number
+  showCurrency?: boolean
 }
 
 export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
   data = [],
+  title = "Qurilmalar va Platformalar",
+  subtitle = "Ulashuv ulushi",
   totalLabel = 'Jami',
   totalCount,
   height = 190,
+  showCurrency = false,
 }) => {
   const safeData = Array.isArray(data) ? data : []
   const total = totalCount ?? safeData.reduce((acc, cur) => acc + (cur?.value || 0), 0)
@@ -345,10 +365,10 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
     <div className="w-full">
       <div className="flex items-center justify-between pb-1">
         <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-          Qurilmalar va Platformalar
+          {title}
         </h3>
         <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-          Ulashuv ulushi
+          {subtitle}
         </span>
       </div>
 
@@ -377,7 +397,9 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
                   return (
                     <div className="rounded-xl border border-slate-200 bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm dark:border-dark-border dark:bg-dark-card/95 text-xs">
                       <span className="font-semibold text-slate-900 dark:text-white">{item.name || ''}: </span>
-                      <strong className="text-finora-700 dark:text-finora-400">{val} ta ({pct}%)</strong>
+                      <strong className="text-finora-700 dark:text-finora-400">
+                        {showCurrency ? formatCompactCurrency(val) : `${val.toLocaleString()} ta`} ({pct}%)
+                      </strong>
                     </div>
                   )
                 }
@@ -390,7 +412,7 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
         {/* Center counter badge */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
-            {total.toLocaleString()}
+            {showCurrency ? formatCompactCurrency(total) : total.toLocaleString()}
           </span>
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
             {totalLabel}
@@ -418,17 +440,21 @@ export const EngagementDonutChart: React.FC<EngagementDonutProps> = ({
 interface CustomerGaugeProps {
   score?: number
   title?: string
+  subtitle?: string
+  badgeLabel?: string
   breakdown?: Array<{
     category: string
     range: string
     proportion: string
-    count: number
+    count: number | string
   }>
 }
 
 export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
   score = 84.6,
   title = "Foydalanuvchilar Sodiqligi",
+  subtitle = "Faollik va sodiqlik indeksi (NPS)",
+  badgeLabel = "Yuqori sodiqlik",
   breakdown = [],
 }) => {
   const numScore = typeof score === 'number' && !isNaN(score) ? score : 84.6
@@ -443,7 +469,7 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
           {title}
         </h3>
         <p className="text-[11px] text-slate-500 dark:text-slate-400">
-          Faollik va sodiqlik indeksi (NPS)
+          {subtitle}
         </p>
       </div>
 
@@ -498,7 +524,7 @@ export const CustomerSatisfactionGauge: React.FC<CustomerGaugeProps> = ({
             </span>
           </div>
           <span className="inline-block rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 mt-0.5">
-            Yuqori sodiqlik
+            {badgeLabel}
           </span>
         </div>
       </div>
