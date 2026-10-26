@@ -261,3 +261,43 @@ export interface AdminUserWithPerms {
   granted_by_name?: string
   created_at?: string
 }
+
+export interface CashflowTrendPoint {
+  date: string
+  income: number
+  expense: number
+  transaction_count?: number
+}
+
+export interface UserGrowthPoint {
+  year: number
+  month: number
+  month_name: string
+  count: number
+}
+
+export interface EcosystemRadarPoint {
+  metric: string
+  score: number
+  benchmark: number
+  full_mark?: number
+}
+
+export interface RankingUserItem {
+  user_id: number
+  full_name: string
+  email: string
+  avatar_url?: string | null
+  transaction_count: number
+  total_amount: number
+  rank: number
+}
+
+export interface AdminOverviewCharts {
+  monthly_dynamics: AdminMonthlyDynamic[]
+  user_growth: UserGrowthPoint[]
+  cashflow_trends: CashflowTrendPoint[]
+  ecosystem_radar: EcosystemRadarPoint[]
+  top_users_ranking: RankingUserItem[]
+}
+
