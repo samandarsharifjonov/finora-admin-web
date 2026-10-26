@@ -1,4 +1,4 @@
-﻿export interface PermissionBadgeInfo {
+export interface PermissionBadgeInfo {
   code: string
   label: string
   shortLabel: string
@@ -65,6 +65,12 @@ export const PERMISSION_MAP: Record<string, PermissionBadgeInfo> = {
     label: 'Qo‘llab-quvvatlash chati',
     shortLabel: 'Support Chat',
     color: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300 border-cyan-200/60 dark:border-cyan-900/60',
+  },
+  'admin_panel.access': {
+    code: 'admin_panel.access',
+    label: 'Admin panelga kirish',
+    shortLabel: 'Web kirish',
+    color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-900/60',
   },
 }
 

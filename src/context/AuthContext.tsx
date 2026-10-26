@@ -29,10 +29,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       const data = await apiRequest<any>('/auth/me')
       const userData = data?.data || data
-      if (userData && (userData.is_admin || userData.is_super_admin)) {
+      const canAccessAdmin = userData && (userData.is_super_admin || userData.permissions?.includes('admin_panel.access'))
+      if (canAccessAdmin) {
         setUser(userData)
       } else {
-        // Not an admin
+        // Not authorized for admin panel
         logout()
       }
     } catch {
@@ -72,6 +73,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Kechirasiz, ushbu hisobda Admin boshqaruv ruxsati mavjud emas!")
       }
 
+      const hasAdminPanelAccess = user.is_super_admin || user.permissions?.includes('admin_panel.access')
+      if (!hasAdminPanelAccess) {
+        throw new Error("Kechirasiz, sizga Admin panelga kirish ruxsati berilmagan!")
+      }
+
       setToken(token)
       setTokenState(token)
       setUser(user)
@@ -81,6 +87,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const loginWithQr = (token: string, user: User) => {
+    const hasAdminPanelAccess = user.is_super_admin || user.permissions?.includes('admin_panel.access')
+    if (!hasAdminPanelAccess) {
+      throw new Error("Kechirasiz, sizga Admin panelga kirish ruxsati berilmagan!")
+    }
     setToken(token)
     setTokenState(token)
     setUser(user)

@@ -121,6 +121,14 @@ export const LoginPage: React.FC = () => {
         })
 
         if (res.status === 'confirmed' && res.token && res.user) {
+          const hasAccess = res.user.is_super_admin || res.user.permissions?.includes('admin_panel.access')
+          if (!hasAccess) {
+            setIsQrExpired(true)
+            setQrError("Kechirasiz, ushbu hisobga Admin panelga kirish ruxsati berilmagan!")
+            if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+            return
+          }
+
           setIsQrSuccess(true)
           if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
 
