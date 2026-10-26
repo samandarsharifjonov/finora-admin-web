@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   FileText,
   X,
+  LogOut,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { UserAvatar } from '../common/UserAvatar'
@@ -19,7 +20,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { user, hasPermission } = useAuth()
+  const { user, hasPermission, logout } = useAuth()
   const logoUrl = `${import.meta.env.BASE_URL}logo.png`
 
   const canOverview = hasPermission('overview.view')
@@ -167,23 +168,41 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* User preview footer */}
         {user && (
-          <div className="border-t border-slate-200 p-3.5 dark:border-dark-border">
+          <div className="border-t border-slate-200 p-3.5 dark:border-dark-border space-y-2.5">
             <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-2.5 dark:bg-dark-cardSecondary border border-slate-200/60 dark:border-dark-border/60">
               <UserAvatar
                 src={user.avatar_url}
                 name={user.full_name}
                 email={user.email}
-                size="sm"
+                size="md"
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">
+                <p
+                  className="truncate text-xs font-semibold text-slate-900 dark:text-white"
+                  title={user.full_name || 'Admin'}
+                >
                   {user.full_name || 'Admin'}
                 </p>
-                <p className="truncate text-[10.5px] text-slate-400">
-                  {user.is_super_admin ? 'Super Admin' : 'Admin'}
+                <p
+                  className="truncate text-[11px] text-slate-500 dark:text-slate-400"
+                  title={user.email}
+                >
+                  {user.email}
                 </p>
               </div>
             </div>
+
+            <button
+              onClick={() => {
+                onClose()
+                logout()
+              }}
+              title="Tizimdan chiqish"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-400 dark:hover:bg-rose-950/60"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Chiqish</span>
+            </button>
           </div>
         )}
       </aside>
