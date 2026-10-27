@@ -7,6 +7,8 @@ import {
   BarChart3,
   BellRing,
   ShieldCheck,
+  ShieldAlert,
+  Receipt,
   FileText,
   X,
   LogOut,
@@ -68,6 +70,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           },
         ]
       : []),
+    ...(canUsers || canOverview || isSuperAdmin
+      ? [
+          {
+            to: '/receipts',
+            label: 'Soliq OFD Cheklari',
+            icon: Receipt,
+          },
+        ]
+      : []),
     ...(canSupport
       ? [
           {
@@ -98,6 +109,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       : []),
     ...(isSuperAdmin
       ? [
+          {
+            to: '/protected-users',
+            label: 'Himoyalangan hisoblar',
+            icon: ShieldAlert,
+          },
           {
             to: '/admins',
             label: 'Adminlar va rollar',

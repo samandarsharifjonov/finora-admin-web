@@ -302,5 +302,5 @@ export interface AdminOverviewCharts {
 }
 
 export * from './support'
-
-
+export * from './protectedUsers'
+export * from './receipts'

@@ -15,6 +15,8 @@ import { BroadcastPage } from './pages/BroadcastPage'
 import { AdminsPage } from './pages/AdminsPage'
 import { TermsPage } from './pages/TermsPage'
 import { SupportPage } from './pages/SupportPage'
+import { ProtectedUsersPage } from './pages/ProtectedUsersPage'
+import { ReceiptsPage } from './pages/ReceiptsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 // Normalize router basename so trailing slash does not break route matching on GitHub Pages
@@ -131,6 +133,22 @@ export function App() {
                 element={
                   <PermissionGuard superAdminOnly>
                     <AdminsPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="protected-users"
+                element={
+                  <PermissionGuard superAdminOnly>
+                    <ProtectedUsersPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="receipts"
+                element={
+                  <PermissionGuard permission={['overview.view', 'users.view']}>
+                    <ReceiptsPage />
                   </PermissionGuard>
                 }
               />
