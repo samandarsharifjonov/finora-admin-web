@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { Lock, RefreshCw, LogOut, CheckCircle2, ShieldCheck, KeyRound } from 'lucide-react'
+import { Lock, RefreshCw, LogOut, CheckCircle2, ShieldCheck, KeyRound, ShieldAlert, AlertTriangle } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../../lib/security'
+import { UserAvatar } from '../common/UserAvatar'
+import type { User } from '../../types'
 
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000 // 5 daqiqa (millisekundda)
 const STORAGE_LOCKED_KEY = 'finora_screen_locked'
@@ -38,6 +40,7 @@ export const AutoLockOverlay: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(60)
   const [isExpired, setIsExpired] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [securityAlert, setSecurityAlert] = useState<string | null>(null)
 
   // Password unlock state
   const [showPasswordInput, setShowPasswordInput] = useState(false)
@@ -59,6 +62,7 @@ export const AutoLockOverlay: React.FC = () => {
     setShowPasswordInput(false)
     setPassword('')
     setPasswordError(null)
+    setSecurityAlert(null)
     generateQr()
   }
 
@@ -76,6 +80,7 @@ export const AutoLockOverlay: React.FC = () => {
     setQrToken(null)
     setPassword('')
     setPasswordError(null)
+    setSecurityAlert(null)
     setShowPasswordInput(false)
     resetTimer()
   }
@@ -117,6 +122,10 @@ export const AutoLockOverlay: React.FC = () => {
       setTimeLeft(60)
       const res = await apiRequest<{ qr_token: string; expires_in: number }>('/auth/qr/generate', {
         method: 'POST',
+        body: JSON.stringify({
+          locked_user_id: user?.id,
+          super_admin_only: user?.is_super_admin ?? false,
+        }),
       })
       setQrToken(res.qr_token)
     } catch {
@@ -244,11 +253,37 @@ export const AutoLockOverlay: React.FC = () => {
 
     const poll = async () => {
       try {
-        const res = await apiRequest<{ status: string }>('/auth/qr/status', {
+        const res = await apiRequest<{
+          status: string
+          user?: User
+          unauthorized_attempt?: string
+        }>('/auth/qr/status', {
           params: { token: qrToken },
         })
 
+        if (res.unauthorized_attempt) {
+          setSecurityAlert(
+            `Xavfsizlik ogohlantirishi: "${res.unauthorized_attempt}" ushbu ekranni ochishga urindi, biroq xavfsizlik tizimi tomonidan kirish rad etildi!`
+          )
+        }
+
         if (res.status === 'confirmed') {
+          // Xavfsizlik tekshiruvi: faqat Super Admin yoki asl hisob egasi ochishi shart!
+          if (user?.is_super_admin && !res.user?.is_super_admin) {
+            setSecurityAlert(
+              "Xavfsizlik ogohlantirishi: Ushbu sessiyani faqat Super Admin ochishi mumkin! Begona admin kirishi bloklandi."
+            )
+            generateQr()
+            return
+          }
+          if (user && res.user && res.user.id !== user.id) {
+            setSecurityAlert(
+              "Xavfsizlik ogohlantirishi: Sessiyani faqat uning asl egasi ochishi mumkin! Begona kirish bloklandi."
+            )
+            generateQr()
+            return
+          }
+
           setIsSuccess(true)
           setTimeout(() => {
             unlockScreen()
@@ -334,12 +369,48 @@ export const AutoLockOverlay: React.FC = () => {
           <Lock className="h-7 w-7" />
         </div>
 
-        <h2 className="mt-4 text-xl font-black tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-3.5 text-xl font-black tracking-tight text-slate-900 dark:text-white">
           Finora Web qulflangan
         </h2>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Kompyuter faolsiz qolgani sababli xavfsizlik uchun qulflanildi
+          Faolsizlik sababli sessiya xavfsizlik uchun qulflanildi
         </p>
+
+        {/* Locked User Profile Card */}
+        {user && (
+          <div className="mt-3.5 flex items-center gap-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-2.5 text-left dark:border-dark-border dark:bg-dark-cardSecondary">
+            <UserAvatar src={user.avatar_url} name={user.full_name} email={user.email} size="sm" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="truncate text-xs font-bold text-slate-900 dark:text-white">
+                  {user.full_name || user.email}
+                </span>
+                {user.is_super_admin && (
+                  <span className="rounded-full border border-finora-500/30 bg-finora-500/15 px-1.5 py-0.2 text-[9.5px] font-black text-finora-700 dark:text-finora-400">
+                    SUPER ADMIN
+                  </span>
+                )}
+              </div>
+              <div className="truncate text-[10.5px] text-slate-400">{user.email}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Super Admin Lock Badge */}
+        {user?.is_super_admin && (
+          <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-finora-500/30 bg-finora-500/15 px-3 py-1 text-[11px] font-bold text-finora-800 dark:text-finora-300">
+            <ShieldAlert className="h-3.5 w-3.5 text-finora-600 dark:text-finora-400" />
+            <span>Faqat Super Admin ochishi mumkin</span>
+          </div>
+        )}
+
+        {/* Real-time Security Alert Banner */}
+        {securityAlert && (
+          <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-left text-[11px] font-semibold text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-200 animate-in fade-in">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+            <p className="flex-1">{securityAlert}</p>
+          </div>
+        )}
 
         {isSuccess ? (
           <div className="my-8 flex flex-col items-center justify-center py-6 text-emerald-600 dark:text-emerald-400">
@@ -348,12 +419,12 @@ export const AutoLockOverlay: React.FC = () => {
           </div>
         ) : !showPasswordInput ? (
           /* QR Unlock Mode */
-          <div className="mt-5 space-y-4">
-            <div className="relative mx-auto flex h-52 w-52 items-center justify-center rounded-2xl border border-slate-200 bg-white p-3 shadow-inner dark:border-dark-border">
+          <div className="mt-4 space-y-3.5">
+            <div className="relative mx-auto flex h-48 w-48 items-center justify-center rounded-2xl border border-slate-200 bg-white p-3 shadow-inner dark:border-dark-border">
               {qrToken && !isExpired ? (
                 <QRCodeSVG
                   value={`finora_qr:${qrToken}`}
-                  size={184}
+                  size={168}
                   level="M"
                   includeMargin={false}
                 />
@@ -372,7 +443,7 @@ export const AutoLockOverlay: React.FC = () => {
                   </p>
                   <button
                     onClick={generateQr}
-                    className="mt-3 flex items-center gap-1.5 rounded-xl bg-finora-500 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-sm hover:bg-finora-600"
+                    className="mt-3 flex items-center gap-1.5 rounded-xl bg-finora-500 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-sm hover:bg-finora-400"
                   >
                     <RefreshCw className="h-3.5 w-3.5" /> Yangilash
                   </button>
@@ -380,13 +451,20 @@ export const AutoLockOverlay: React.FC = () => {
               )}
             </div>
 
-            {/* Countdown timer */}
+            {/* Countdown timer & Security note */}
             {!isExpired && (
-              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400">
-                <ShieldCheck className="h-3.5 w-3.5 text-finora-500" />
-                <span>
-                  Finora mobil ilovasida skanerlang (<strong className="text-slate-900 dark:text-white">{timeLeft}s</strong>)
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400">
+                  <ShieldCheck className="h-3.5 w-3.5 text-finora-500" />
+                  <span>
+                    Finora mobil ilovasida skanerlang (<strong className="text-slate-900 dark:text-white">{timeLeft}s</strong>)
+                  </span>
+                </div>
+                {user?.is_super_admin && (
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                    Oddiy adminlar skaner qilganda kirish avtomatik ravishda rad etiladi
+                  </p>
+                )}
               </div>
             )}
 
