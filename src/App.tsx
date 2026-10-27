@@ -15,7 +15,6 @@ import { BroadcastPage } from './pages/BroadcastPage'
 import { AdminsPage } from './pages/AdminsPage'
 import { TermsPage } from './pages/TermsPage'
 import { SupportPage } from './pages/SupportPage'
-import { SupportChatPage } from './pages/SupportChatPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 // Normalize router basename so trailing slash does not break route matching on GitHub Pages
@@ -155,7 +154,7 @@ export function App() {
                 path="support/:userId"
                 element={
                   <PermissionGuard permission="support.chat">
-                    <SupportChatPage />
+                    <SupportPage />
                   </PermissionGuard>
                 }
               />
