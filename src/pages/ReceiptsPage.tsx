@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useTransition } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Receipt,
   Search,
@@ -95,7 +96,7 @@ export const ReceiptsPage: React.FC = () => {
   const totalPages = Math.ceil(total / limit) || 1
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Page Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -103,7 +104,7 @@ export const ReceiptsPage: React.FC = () => {
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">
               Soliq OFD Cheklari
             </h1>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">
+            <span className="inline-flex items-center gap-1 rounded-full border border-finora-500/30 bg-finora-500/15 px-2.5 py-0.5 text-[11px] font-bold text-finora-800 dark:text-finora-300">
               <QrCode className="h-3 w-3" />
               OFD / Soliq
             </span>
@@ -117,95 +118,99 @@ export const ReceiptsPage: React.FC = () => {
           <button
             onClick={() => loadReceipts(offset, search, paymentType)}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-200 dark:hover:bg-slate-800"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin text-finora-600' : ''}`} />
             Yangilash
           </button>
         </div>
       </div>
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      {/* KPI Stats (Compact, Elegant, Branded) */}
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Card 1: Jami Skanerlangan */}
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Jami skanerlangan</span>
-            <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-              <Receipt className="h-5 w-5" />
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Jami skanerlangan</span>
+            <div className="rounded-xl border border-finora-500/20 bg-finora-500/15 p-2 text-finora-700 dark:text-finora-400">
+              <Receipt className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">
+          <div className="mt-2.5 text-2xl font-black text-slate-900 dark:text-white">
             {total.toLocaleString()}
           </div>
-          <span className="text-[11px] text-slate-400">Soliq bazasidagi cheklar</span>
+          <span className="text-[11px] font-medium text-slate-400">Soliq bazasidagi cheklar</span>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+        {/* Card 2: Sahifadagi Aylanma */}
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Sahifadagi aylanma</span>
-            <div className="rounded-xl bg-emerald-50 p-2.5 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
-              <CreditCard className="h-5 w-5" />
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Sahifadagi aylanma</span>
+            <div className="rounded-xl bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+              <CreditCard className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <div className="mt-2.5 text-2xl font-black text-emerald-600 dark:text-emerald-400">
             {formatCurrency(totalAmount)}
           </div>
-          <span className="text-[11px] text-slate-400">{receipts.length} ta chek summasi</span>
+          <span className="text-[11px] font-medium text-slate-400">{receipts.length} ta chek summasi</span>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+        {/* Card 3: O'rtacha Chek */}
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">O'rtacha chek qiymati</span>
-            <div className="rounded-xl bg-amber-50 p-2.5 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
-              <Banknote className="h-5 w-5" />
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">O'rtacha chek qiymati</span>
+            <div className="rounded-xl bg-amber-50 p-2 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
+              <Banknote className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">
+          <div className="mt-2.5 text-2xl font-black text-slate-900 dark:text-white">
             {formatCurrency(averageAmount)}
           </div>
-          <span className="text-[11px] text-slate-400">Har bitta xarid uchun</span>
+          <span className="text-[11px] font-medium text-slate-400">Har bitta xarid uchun</span>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+        {/* Card 4: Tovar Pozitsiyalari */}
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Tovar pozitsiyalari</span>
-            <div className="rounded-xl bg-purple-50 p-2.5 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
-              <ShoppingBag className="h-5 w-5" />
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Tovar pozitsiyalari</span>
+            <div className="rounded-xl border border-finora-500/20 bg-finora-500/10 p-2 text-finora-700 dark:text-finora-400">
+              <ShoppingBag className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">
+          <div className="mt-2.5 text-2xl font-black text-slate-900 dark:text-white">
             {totalItems.toLocaleString()}
           </div>
-          <span className="text-[11px] text-slate-400">Xarid qilingan mahsulotlar</span>
+          <span className="text-[11px] font-medium text-slate-400">Xarid qilingan mahsulotlar</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm dark:border-dark-border dark:bg-dark-card sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Do'kon nomi, STIR/TIN, fiskal belgi yoki foydalanuvchi qidirish..."
             value={search}
             onChange={handleSearchChange}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-9 pr-4 text-xs text-slate-900 transition focus:border-indigo-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-800/50 dark:text-white dark:focus:bg-slate-900"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-4 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {[
             { id: '', label: 'Barchasi' },
-            { id: 'card', label: 'Karta (Karta / Humo / Uzcard)' },
+            { id: 'card', label: 'Bank kartasi' },
             { id: 'cash', label: 'Naqd pul' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => handlePaymentTypeChange(tab.id)}
-              className={`shrink-0 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition ${
+              className={`shrink-0 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
                 paymentType === tab.id
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                  ? 'bg-finora-500 text-slate-950 shadow-sm shadow-finora-500/25'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-dark-cardSecondary dark:text-slate-300 dark:hover:bg-slate-800'
               }`}
             >
               {tab.label}
@@ -216,39 +221,37 @@ export const ReceiptsPage: React.FC = () => {
 
       {/* Error notification */}
       {error && (
-        <div className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50/70 p-4 text-xs text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-200">
-          <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
+          <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
           <p className="font-medium">{error}</p>
         </div>
       )}
 
       {/* Receipts Table Card */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
-        <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Receipt className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                OFD Cheklari Ro'yxati
-              </h2>
-            </div>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              {total} ta chek
-            </span>
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-dark-border dark:bg-dark-card">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-dark-border">
+          <div className="flex items-center gap-2">
+            <Receipt className="h-4 w-4 text-finora-600 dark:text-finora-400" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              OFD Cheklari Ro'yxati
+            </h2>
           </div>
+          <span className="rounded-full border border-finora-500/25 bg-finora-500/10 px-2.5 py-0.5 text-[11px] font-bold text-finora-800 dark:text-finora-300">
+            {total} ta chek
+          </span>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <RefreshCw className="h-8 w-8 animate-spin text-indigo-500" />
-            <p className="mt-3 text-xs text-slate-400">Cheklar yuklanmoqda...</p>
+            <div className="h-7 w-7 animate-spin rounded-full border-2 border-finora-500 border-t-transparent" />
+            <p className="mt-2.5 text-xs text-slate-400">Cheklar yuklanmoqda...</p>
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/50">
-              <Receipt className="h-10 w-10 text-slate-400" />
+            <div className="rounded-2xl border border-finora-500/20 bg-finora-500/10 p-3.5 text-finora-600 dark:text-finora-400">
+              <Receipt className="h-8 w-8" />
             </div>
-            <h3 className="mt-4 text-sm font-bold text-slate-800 dark:text-slate-200">
+            <h3 className="mt-3 text-sm font-bold text-slate-800 dark:text-slate-200">
               Cheklar topilmadi
             </h3>
             <p className="mt-1 max-w-sm text-xs text-slate-400">
@@ -257,29 +260,29 @@ export const ReceiptsPage: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50/75 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:bg-slate-800/40 dark:text-slate-400">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-slate-200/80 bg-slate-50/75 text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-400">
                 <tr>
-                  <th scope="col" className="px-6 py-3.5">Savdo nuqtasi / Do'kon</th>
-                  <th scope="col" className="px-6 py-3.5">Foydalanuvchi</th>
-                  <th scope="col" className="px-6 py-3.5">Fiskal Ma'lumot</th>
-                  <th scope="col" className="px-6 py-3.5">Sana</th>
-                  <th scope="col" className="px-6 py-3.5">To'lov turi</th>
-                  <th scope="col" className="px-6 py-3.5">Summa</th>
-                  <th scope="col" className="px-6 py-3.5 text-right">Amal</th>
+                  <th scope="col" className="px-5 py-3">Savdo nuqtasi / Do'kon</th>
+                  <th scope="col" className="px-5 py-3">Foydalanuvchi</th>
+                  <th scope="col" className="px-5 py-3">Fiskal Ma'lumot</th>
+                  <th scope="col" className="px-5 py-3">Sana</th>
+                  <th scope="col" className="px-5 py-3">To'lov turi</th>
+                  <th scope="col" className="px-5 py-3">Summa</th>
+                  <th scope="col" className="px-5 py-3 text-right">Amal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
+              <tbody className="divide-y divide-slate-100 dark:divide-dark-border/60">
                 {receipts.map((rc) => {
                   const isCard = rc.payment_type?.toLowerCase().includes('card')
                   return (
                     <tr
                       key={rc.id}
-                      className="transition hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+                      className="transition-colors hover:bg-slate-50/60 dark:hover:bg-dark-cardSecondary/50"
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="rounded-xl bg-slate-100 p-2.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          <div className="rounded-xl border border-finora-500/20 bg-finora-500/10 p-2 text-finora-700 dark:text-finora-400">
                             <Building2 className="h-4 w-4" />
                           </div>
                           <div>
@@ -287,32 +290,35 @@ export const ReceiptsPage: React.FC = () => {
                               {rc.merchant_name || 'Nomaʼlum savdo nuqtasi'}
                             </div>
                             <div className="text-[11px] text-slate-400">
-                              STIR: <span className="font-mono">{rc.merchant_tin || '—'}</span>
+                              STIR: <span className="font-mono text-slate-500 dark:text-slate-400">{rc.merchant_tin || '—'}</span>
                             </div>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <UserAvatar
                             src={rc.user_avatar}
                             name={rc.user_full_name || rc.user_email}
                             className="h-8 w-8 text-[11px]"
                           />
-                          <div>
-                            <div className="font-semibold text-slate-800 dark:text-slate-200">
+                          <div className="min-w-0">
+                            <Link
+                              to={`/users/${rc.user_id}`}
+                              className="font-bold text-slate-800 hover:text-finora-600 dark:text-slate-200 dark:hover:text-finora-400 transition"
+                            >
                               {rc.user_full_name || 'Nomaʼlum'}
-                            </div>
-                            <div className="text-[10px] text-slate-400">{rc.user_email}</div>
+                            </Link>
+                            <div className="text-[10px] text-slate-400 truncate max-w-xs">{rc.user_email}</div>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="space-y-0.5 font-mono text-[11px]">
                           <div>
-                            FP: <span className="font-bold text-slate-700 dark:text-slate-300">{rc.fiscal_sign || '—'}</span>
+                            FP: <span className="font-bold text-slate-800 dark:text-slate-200">{rc.fiscal_sign || '—'}</span>
                           </div>
                           <div className="text-[10px] text-slate-400">
                             ID: {rc.receipt_id || `ID-${rc.id}`}
@@ -320,19 +326,19 @@ export const ReceiptsPage: React.FC = () => {
                         </div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
                           <Calendar className="h-3.5 w-3.5 text-slate-400" />
                           <span>{formatDate(rc.receipt_date || rc.created_at)}</span>
                         </div>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10.5px] font-bold ${
                             isCard
-                              ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
-                              : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                              ? 'border border-blue-500/20 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-950/40 dark:text-blue-300'
+                              : 'border border-finora-500/20 bg-finora-500/10 text-finora-800 dark:border-finora-500/30 dark:bg-finora-500/15 dark:text-finora-300'
                           }`}
                         >
                           {isCard ? <CreditCard className="h-3 w-3" /> : <Banknote className="h-3 w-3" />}
@@ -340,19 +346,19 @@ export const ReceiptsPage: React.FC = () => {
                         </span>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3.5">
                         <div className="font-black text-slate-900 dark:text-white">
                           {formatCurrency(rc.total_sum)}
                         </div>
-                        <div className="text-[10px] text-slate-400">
-                          {rc.item_count} ta mahsulot
+                        <div className="text-[10px] font-medium text-slate-400">
+                          {rc.item_count} ta tovar
                         </div>
                       </td>
 
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-5 py-3.5 text-right">
                         <button
                           onClick={() => handleViewReceipt(rc)}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-900/50 dark:bg-indigo-950/30 dark:text-indigo-300 dark:hover:bg-indigo-950/60"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-finora-500/30 bg-finora-500/10 px-3 py-1.5 text-xs font-bold text-finora-800 transition hover:bg-finora-500 hover:text-slate-950 dark:text-finora-300 dark:hover:bg-finora-500 dark:hover:text-slate-950"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           Chekni ko'rish
@@ -368,8 +374,8 @@ export const ReceiptsPage: React.FC = () => {
 
         {/* Pagination Bar */}
         {total > limit && (
-          <div className="flex items-center justify-between border-t border-slate-100 px-6 py-3.5 dark:border-slate-800">
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 dark:border-dark-border">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
               Jami {total} tadan {offset + 1}–{Math.min(offset + limit, total)} ko'rsatilmoqda
             </span>
 
@@ -377,7 +383,7 @@ export const ReceiptsPage: React.FC = () => {
               <button
                 onClick={() => setOffset(Math.max(0, offset - limit))}
                 disabled={offset === 0}
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 dark:border-dark-border dark:text-slate-300 dark:hover:bg-dark-cardSecondary"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 Oldingi
@@ -388,7 +394,7 @@ export const ReceiptsPage: React.FC = () => {
               <button
                 onClick={() => setOffset(offset + limit)}
                 disabled={offset + limit >= total}
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40 dark:border-dark-border dark:text-slate-300 dark:hover:bg-dark-cardSecondary"
               >
                 Keyingi
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -400,44 +406,44 @@ export const ReceiptsPage: React.FC = () => {
 
       {/* Soliq OFD Receipt Inspector Modal */}
       {selectedReceipt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/60 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl dark:border-dark-border dark:bg-dark-card">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4 dark:border-dark-border">
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-emerald-50 p-2.5 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
-                  <Receipt className="h-6 w-6" />
+                <div className="rounded-xl border border-finora-500/20 bg-finora-500/15 p-2.5 text-finora-700 dark:text-finora-400">
+                  <Receipt className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">
                       {selectedReceipt.merchant_name || 'Fiskal Chek Tafsilotlari'}
                     </h3>
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                    <span className="rounded-full border border-finora-500/30 bg-finora-500/15 px-2 py-0.5 text-[10px] font-bold text-finora-800 dark:text-finora-300">
                       Soliq OFD
                     </span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    STIR: <span className="font-mono text-slate-600 dark:text-slate-300">{selectedReceipt.merchant_tin || '—'}</span> &bull; Fiskal belgi: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{selectedReceipt.fiscal_sign || '—'}</span>
+                    STIR: <span className="font-mono text-slate-600 dark:text-slate-300">{selectedReceipt.merchant_tin || '—'}</span> &bull; Fiskal belgi: <span className="font-mono font-bold text-slate-800 dark:text-slate-100">{selectedReceipt.fiscal_sign || '—'}</span>
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedReceipt(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Soliq Receipt Simulation Card */}
-            <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-4 font-mono text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-300">
-              <div className="flex flex-col gap-2 border-b border-dashed border-slate-300 pb-3 text-center dark:border-slate-700">
-                <span className="text-xs font-bold tracking-widest text-slate-900 uppercase dark:text-white">
+            <div className="mt-4 rounded-xl border border-dashed border-slate-300/80 bg-slate-50/70 p-4 font-mono text-xs text-slate-700 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300">
+              <div className="flex flex-col gap-1.5 border-b border-dashed border-slate-300 pb-3 text-center dark:border-dark-border">
+                <span className="text-[11px] font-black tracking-widest text-slate-900 uppercase dark:text-white">
                   O'ZBEKISTON RESPUBLIKASI SOLIQ QO'MITASI
                 </span>
-                <span className="text-[11px] text-slate-500">
+                <span className="text-[10px] text-slate-500">
                   ONLAYN NAZORAT-KASSA MASHINASI CHEKI
                 </span>
                 <div className="text-[10px] text-slate-400">
@@ -464,7 +470,7 @@ export const ReceiptsPage: React.FC = () => {
             {/* Receipt Items Table */}
             <div className="mt-4">
               <div className="flex items-center justify-between pb-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Xarid qilingan tovar va xizmatlar ({selectedReceipt.items?.length || selectedReceipt.item_count} ta)
                 </h4>
                 {selectedReceipt.fiscal_sign && (
@@ -472,7 +478,7 @@ export const ReceiptsPage: React.FC = () => {
                     href={`https://ofd.soliq.uz/check?t=${selectedReceipt.fiscal_sign}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-finora-700 hover:text-finora-800 dark:text-finora-400 dark:hover:text-finora-300 hover:underline transition"
                   >
                     <ExternalLink className="h-3 w-3" />
                     Soliq OFD Portalida tekshirish
@@ -482,12 +488,12 @@ export const ReceiptsPage: React.FC = () => {
 
               {modalLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <RefreshCw className="h-6 w-6 animate-spin text-indigo-500" />
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-finora-500 border-t-transparent" />
                 </div>
               ) : selectedReceipt.items && selectedReceipt.items.length > 0 ? (
-                <div className="max-h-64 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="max-h-60 overflow-y-auto rounded-xl border border-slate-200 dark:border-dark-border">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-[10px] font-bold uppercase text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
+                    <thead className="bg-slate-50/80 text-[10px] font-bold uppercase text-slate-500 dark:bg-dark-cardSecondary dark:text-slate-400 border-b border-slate-200/80 dark:border-dark-border">
                       <tr>
                         <th className="px-3 py-2">#</th>
                         <th className="px-3 py-2">Tovar nomi</th>
@@ -497,23 +503,23 @@ export const ReceiptsPage: React.FC = () => {
                         <th className="px-3 py-2 text-right">Jami</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    <tbody className="divide-y divide-slate-100 dark:divide-dark-border/60">
                       {selectedReceipt.items.map((item, idx) => (
-                        <tr key={item.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
-                          <td className="px-3 py-2 text-slate-400">{idx + 1}</td>
-                          <td className="px-3 py-2 font-medium text-slate-800 dark:text-slate-200">
+                        <tr key={item.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-dark-cardSecondary/50">
+                          <td className="px-3 py-2 text-slate-400 font-mono text-[11px]">{idx + 1}</td>
+                          <td className="px-3 py-2 font-semibold text-slate-800 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="px-3 py-2 font-mono text-[10px] text-slate-400">
+                          <td className="px-3 py-2 font-mono text-[10.5px] text-slate-400">
                             {item.catalog_code || '—'}
                           </td>
-                          <td className="px-3 py-2 text-right text-slate-600 dark:text-slate-300">
+                          <td className="px-3 py-2 text-right text-slate-600 dark:text-slate-300 font-mono">
                             {item.amount}
                           </td>
-                          <td className="px-3 py-2 text-right text-slate-600 dark:text-slate-300">
+                          <td className="px-3 py-2 text-right text-slate-600 dark:text-slate-300 font-mono">
                             {formatCurrency(item.price)}
                           </td>
-                          <td className="px-3 py-2 text-right font-bold text-slate-900 dark:text-white">
+                          <td className="px-3 py-2 text-right font-bold text-slate-900 dark:text-white font-mono">
                             {formatCurrency(item.total_cost)}
                           </td>
                         </tr>
@@ -522,26 +528,26 @@ export const ReceiptsPage: React.FC = () => {
                   </table>
                 </div>
               ) : (
-                <div className="rounded-xl border border-slate-200 p-6 text-center text-xs text-slate-400 dark:border-slate-800">
+                <div className="rounded-xl border border-slate-200 p-6 text-center text-xs text-slate-400 dark:border-dark-border">
                   Ushbu chek bo'yicha tovar pozitsiyalari topilmadi
                 </div>
               )}
             </div>
 
             {/* Total Footer */}
-            <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-finora-500/20 bg-finora-500/10 p-3.5 dark:border-finora-500/30 dark:bg-finora-500/15">
               <div className="space-y-0.5">
-                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                  To'lov usuli: <span className="font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedReceipt.payment_type || 'Nomaʼlum'}</span>
+                <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                  To'lov usuli: <span className="font-bold uppercase text-slate-900 dark:text-white">{selectedReceipt.payment_type || 'Nomaʼlum'}</span>
                 </span>
-                <div className="text-[10px] text-slate-400">
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                   Fiskal belgi (ФП): {selectedReceipt.fiscal_sign || '—'}
                 </div>
               </div>
 
               <div className="text-right">
-                <span className="text-[11px] text-slate-400">Jami hisoblangan:</span>
-                <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+                <span className="text-[10.5px] font-medium text-slate-500 dark:text-slate-400">Jami xarid summasi:</span>
+                <div className="text-lg font-black text-slate-950 dark:text-finora-300">
                   {formatCurrency(selectedReceipt.total_sum)}
                 </div>
               </div>
@@ -551,7 +557,7 @@ export const ReceiptsPage: React.FC = () => {
             <div className="mt-5 flex justify-end">
               <button
                 onClick={() => setSelectedReceipt(null)}
-                className="rounded-xl bg-slate-900 px-5 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                className="rounded-xl bg-slate-900 px-5 py-2 text-xs font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
               >
                 Yopish
               </button>
