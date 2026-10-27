@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard,
   Users,
+  Headphones,
   BarChart3,
   BellRing,
   ShieldCheck,
@@ -13,6 +14,7 @@ import {
 import { useAuth } from '../../context/AuthContext'
 import { UserAvatar } from '../common/UserAvatar'
 import { cn } from '../../lib/utils'
+import { fetchAdminUnreadCount } from '../../lib/supportApi'
 
 interface SidebarProps {
   isOpen: boolean
@@ -22,9 +24,11 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user, hasPermission, logout } = useAuth()
   const logoUrl = `${import.meta.env.BASE_URL}logo.png`
+  const [supportUnread, setSupportUnread] = useState(0)
 
   const canOverview = hasPermission('overview.view')
   const canUsers = hasPermission('users.view')
+  const canSupport = hasPermission('support.chat') || user?.is_super_admin
   const canAnalytics =
     hasPermission('categories.analytics') ||
     hasPermission('devices.analytics') ||
@@ -32,6 +36,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const canBroadcast = hasPermission('broadcast.send')
   const canTerms = hasPermission('terms.manage')
   const isSuperAdmin = user?.is_super_admin ?? false
+
+  useEffect(() => {
+    if (!canSupport) return
+    const checkUnread = async () => {
+      const count = await fetchAdminUnreadCount()
+      setSupportUnread(count)
+    }
+    checkUnread()
+    const timer = setInterval(checkUnread, 20000)
+    return () => clearInterval(timer)
+  }, [canSupport])
 
   const navItems = [
     ...(canOverview
@@ -50,6 +65,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             to: '/users',
             label: 'Foydalanuvchilar',
             icon: Users,
+          },
+        ]
+      : []),
+    ...(canSupport
+      ? [
+          {
+            to: '/support',
+            label: 'Murojaatlar',
+            icon: Headphones,
+            badge: supportUnread,
           },
         ]
       : []),
@@ -160,7 +185,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 }
               >
                 <Icon className="h-4 w-4 shrink-0" />
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className="rounded-full bg-rose-500 px-1.5 py-0.2 text-[9.5px] font-black text-white shadow-xs animate-pulse">
+                    {item.badge}
+                  </span>
+                )}
               </NavLink>
             )
           })}

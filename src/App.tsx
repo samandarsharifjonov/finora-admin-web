@@ -14,6 +14,8 @@ import { AnalyticsPage } from './pages/AnalyticsPage'
 import { BroadcastPage } from './pages/BroadcastPage'
 import { AdminsPage } from './pages/AdminsPage'
 import { TermsPage } from './pages/TermsPage'
+import { SupportPage } from './pages/SupportPage'
+import { SupportChatPage } from './pages/SupportChatPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 // Normalize router basename so trailing slash does not break route matching on GitHub Pages
@@ -50,6 +52,9 @@ const DashboardRoute: React.FC = () => {
   }
   if (hasPermission('terms.manage')) {
     return <Navigate to="/terms" replace />
+  }
+  if (hasPermission('support.chat')) {
+    return <Navigate to="/support" replace />
   }
 
   return (
@@ -135,6 +140,22 @@ export function App() {
                 element={
                   <PermissionGuard permission="terms.manage">
                     <TermsPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="support"
+                element={
+                  <PermissionGuard permission="support.chat">
+                    <SupportPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
+                path="support/:userId"
+                element={
+                  <PermissionGuard permission="support.chat">
+                    <SupportChatPage />
                   </PermissionGuard>
                 }
               />
