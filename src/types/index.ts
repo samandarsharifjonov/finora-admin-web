@@ -223,6 +223,9 @@ export interface BroadcastNotification {
   title: string
   body: string
   image_url?: string | null
+  images?: string[]
+  action_url?: string | null
+  views_count?: number
   status: 'sent' | 'scheduled' | 'cancelled' | 'pending' | string
   scheduled_at?: string | null
   sent_at?: string | null
