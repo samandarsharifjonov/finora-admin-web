@@ -18,6 +18,10 @@ interface SupportChatListProps {
   chats: SupportChat[]
   activeUserId: number | null
   rawChatsCount: number
+  total?: number
+  hasMore?: boolean
+  loadingMore?: boolean
+  onLoadMore?: () => void
   stats: SupportStatsSummary
   search: string
   onSearchChange: (q: string) => void
@@ -34,6 +38,10 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
   chats,
   activeUserId,
   rawChatsCount,
+  total,
+  hasMore,
+  loadingMore,
+  onLoadMore,
   stats,
   search,
   onSearchChange,
@@ -128,7 +136,7 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
         {/* Filter Tab Pills */}
         <div className="mt-2.5 flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
           {[
-            { id: 'all', label: 'Barchasi', count: rawChatsCount },
+            { id: 'all', label: 'Barchasi', count: total || rawChatsCount },
             { id: 'unread', label: 'Yangi', count: stats.unreadChats },
             { id: 'online', label: 'Onlayn', count: stats.onlineUsers },
             { id: 'blocked', label: 'Blok', count: stats.blockedUsers },
@@ -293,6 +301,19 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
               </div>
             )
           })
+        )}
+
+        {hasMore && (
+          <div className="pt-1 pb-2">
+            <button
+              type="button"
+              onClick={onLoadMore}
+              disabled={loadingMore}
+              className="w-full rounded-xl border border-slate-200 bg-white py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-200 disabled:opacity-50 transition-colors shadow-2xs"
+            >
+              {loadingMore ? "Yuklanmoqda..." : `Ko'proq yuklash (${chats.length} / ${total || chats.length})`}
+            </button>
+          </div>
         )}
       </div>
     </div>

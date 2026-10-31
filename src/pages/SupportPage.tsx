@@ -15,6 +15,10 @@ export const SupportPage: React.FC = () => {
   const {
     chats,
     rawChatsCount,
+    total,
+    hasMore,
+    loadingMore,
+    loadMore,
     stats,
     refreshing,
     search,
@@ -47,6 +51,10 @@ export const SupportPage: React.FC = () => {
             chats={chats}
             activeUserId={activeUserId}
             rawChatsCount={rawChatsCount}
+            total={total}
+            hasMore={hasMore}
+            loadingMore={loadingMore}
+            onLoadMore={loadMore}
             stats={stats}
             search={search}
             onSearchChange={setSearch}

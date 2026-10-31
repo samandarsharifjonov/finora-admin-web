@@ -20,7 +20,7 @@ export async function fetchAdminChats(params?: {
       params: {
         search: params?.search,
         page: params?.page,
-        limit: params?.limit || 50,
+        limit: params?.limit || 100,
       },
     })
 

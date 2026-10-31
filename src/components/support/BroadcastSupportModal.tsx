@@ -34,7 +34,7 @@ export const BroadcastSupportModal: React.FC<BroadcastSupportModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const [audience, setAudience] = useState<AudienceType>('active_30d')
+  const [audience, setAudience] = useState<AudienceType>('all')
   const [text, setText] = useState('')
   const [mediaUrl, setMediaUrl] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -116,6 +116,13 @@ export const BroadcastSupportModal: React.FC<BroadcastSupportModalProps> = ({
     badgeColor: string
   }[] = [
     {
+      id: 'all',
+      title: 'Barcha foydalanuvchilar',
+      desc: 'Ro\'yxatdan o\'tgan barcha bloklanmagan foydalanuvchilar (100%)',
+      icon: Users,
+      badgeColor: 'text-finora-600 bg-finora-50 dark:bg-finora-950/40 dark:text-finora-400',
+    },
+    {
       id: 'active_30d',
       title: 'Faol foydalanuvchilar (30 kun)',
       desc: 'Oxirgi 30 kunda tizimga kirgan barcha faol foydalanuvchilar',
@@ -128,13 +135,6 @@ export const BroadcastSupportModal: React.FC<BroadcastSupportModalProps> = ({
       desc: 'Oxirgi 1 haftada tizimda faol bo\'lgan foydalanuvchilar',
       icon: Clock,
       badgeColor: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400',
-    },
-    {
-      id: 'all',
-      title: 'Barcha foydalanuvchilar',
-      desc: 'Ro\'yxatdan o\'tgan barcha bloklanmagan foydalanuvchilar',
-      icon: Users,
-      badgeColor: 'text-finora-600 bg-finora-50 dark:bg-finora-950/40 dark:text-finora-400',
     },
     {
       id: 'with_chats',

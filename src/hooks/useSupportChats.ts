@@ -18,6 +18,9 @@ export function useSupportChats() {
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<FilterTab>('all')
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const fetchChats = useCallback(async (isSilent = false) => {
     if (isSilent) {
@@ -28,9 +31,11 @@ export function useSupportChats() {
     setError(null)
 
     try {
-      const res = await fetchAdminChats({ search })
+      const res = await fetchAdminChats({ search, page: 1, limit: 100 })
       setChats(res.chats)
       setTotal(res.total)
+      setPage(1)
+      setHasMore(res.chats.length < res.total)
     } catch (err: any) {
       setError(err?.message || "Murojaatlarni yuklashda xatolik yuz berdi")
     } finally {
@@ -38,6 +43,27 @@ export function useSupportChats() {
       setRefreshing(false)
     }
   }, [search])
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const nextPage = page + 1
+    try {
+      const res = await fetchAdminChats({ search, page: nextPage, limit: 100 })
+      setChats(prev => {
+        const existingIds = new Set(prev.map(c => c.id))
+        const newUnique = res.chats.filter(c => !existingIds.has(c.id))
+        const combined = [...prev, ...newUnique]
+        setHasMore(combined.length < res.total)
+        return combined
+      })
+      setTotal(res.total)
+      setPage(nextPage)
+    } catch (_) {
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, hasMore, page, search])
 
   // Dastlabki yuklash va qidiruv o'zgarganda
   useEffect(() => {
@@ -152,6 +178,9 @@ export function useSupportChats() {
     tab,
     setTab,
     socketStatus,
+    hasMore,
+    loadingMore,
+    loadMore,
     refresh: () => fetchChats(false),
     handleBlock,
     handleUnblock,
