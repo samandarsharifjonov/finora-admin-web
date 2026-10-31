@@ -304,6 +304,18 @@ export interface AdminOverviewCharts {
   top_users_ranking: RankingUserItem[]
 }
 
+export interface AppUpdateConfig {
+  latest_version: string
+  min_version: string
+  is_force_update: boolean
+  is_optional_update: boolean
+  title?: string
+  release_notes?: string
+  play_store_url?: string
+  app_store_url?: string
+  updated_at?: string
+}
+
 export * from './support'
 export * from './protectedUsers'
 export * from './receipts'

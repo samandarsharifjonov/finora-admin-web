@@ -72,6 +72,12 @@ export const PERMISSION_MAP: Record<string, PermissionBadgeInfo> = {
     shortLabel: 'Web kirish',
     color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-900/60',
   },
+  'app_update.manage': {
+    code: 'app_update.manage',
+    label: 'Ilova yangilanishini boshqarish',
+    shortLabel: 'Ilova versiyasi',
+    color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-900/60',
+  },
 }
 
 export function getPermissionInfo(code: string): PermissionBadgeInfo {

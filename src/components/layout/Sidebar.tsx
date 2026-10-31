@@ -10,6 +10,7 @@ import {
   ShieldAlert,
   Receipt,
   FileText,
+  Smartphone,
   X,
   LogOut,
 } from 'lucide-react'
@@ -37,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     hasPermission('deletions.analytics')
   const canBroadcast = hasPermission('broadcast.send')
   const canTerms = hasPermission('terms.manage')
+  const canAppUpdate = hasPermission('app_update.manage') || user?.is_super_admin
   const isSuperAdmin = user?.is_super_admin ?? false
 
   useEffect(() => {
@@ -127,6 +129,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             to: '/terms',
             label: 'Foydalanish shartlari',
             icon: FileText,
+          },
+        ]
+      : []),
+    ...(canAppUpdate
+      ? [
+          {
+            to: '/app-update',
+            label: 'Ilova yangilanishi',
+            icon: Smartphone,
           },
         ]
       : []),
