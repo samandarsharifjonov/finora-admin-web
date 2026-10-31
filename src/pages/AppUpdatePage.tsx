@@ -514,14 +514,9 @@ export const AppUpdatePage: React.FC = () => {
                     <Download className="h-6 w-6" />
                   </div>
 
-                  <h3 className="text-sm font-bold text-white">
+                  <h3 className="text-sm font-bold text-white mb-2">
                     {title || 'Yangi versiya mavjud!'}
                   </h3>
-
-                  {/* Version tag */}
-                  <div className="my-1.5 inline-flex items-center gap-1 rounded-full bg-finora-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-finora-400 border border-finora-500/20">
-                    <span>Yangi: v{version || '1.2.0+26'}</span>
-                  </div>
 
                   {/* Release Notes */}
                   {releaseNotes ? (
