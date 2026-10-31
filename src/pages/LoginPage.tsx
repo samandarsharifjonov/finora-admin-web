@@ -27,6 +27,8 @@ interface QRGenerateResponse {
 interface QRStatusResponse {
   status: 'pending' | 'confirmed' | 'expired'
   token?: string
+  access_token?: string
+  refresh_token?: string
   user?: User
   expires_in?: number
 }
@@ -141,7 +143,7 @@ export const LoginPage: React.FC = () => {
           if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
 
           setTimeout(() => {
-            loginWithQr(res.token!, res.user!)
+            loginWithQr(res.access_token || res.token!, res.user!, res.refresh_token)
             navigate('/', { replace: true })
           }, 600)
         } else if (res.status === 'expired') {

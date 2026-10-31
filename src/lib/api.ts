@@ -31,8 +31,21 @@ export function removeToken(): void {
   } catch (_) {}
 }
 
+export function getRefreshToken(): string | null {
+  return sessionStorage.getItem('finora_admin_refresh_token')
+}
+
+export function setRefreshToken(token: string): void {
+  sessionStorage.setItem('finora_admin_refresh_token', token)
+}
+
+export function removeRefreshToken(): void {
+  sessionStorage.removeItem('finora_admin_refresh_token')
+}
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined | null>
+  _isRetry?: boolean
 }
 
 export async function apiRequest<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
@@ -78,13 +91,45 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestOpti
 
   const resJson = await response.json().catch(() => null)
 
-  // 401 Unauthorized handling
+  // 401 Unauthorized handling (with silent refresh)
   if (response.status === 401) {
     if (endpoint.includes('/auth/login')) {
       const errorMsg = resJson?.error || resJson?.message || "Email yoki parol noto'g'ri"
       throw new Error(errorMsg)
     }
+
+    // Try silent refresh if refresh token is available and not already refreshing/retrying
+    const rt = getRefreshToken()
+    if (rt && !endpoint.includes('/auth/refresh') && !options._isRetry) {
+      try {
+        const refreshResp = await apiRequest<{ token?: string; access_token?: string; refresh_token?: string }>(
+          '/auth/refresh',
+          {
+            method: 'POST',
+            body: JSON.stringify({ refresh_token: rt }),
+            _isRetry: true,
+          } as RequestOptions
+        )
+
+        const newToken = refreshResp?.access_token || refreshResp?.token
+        if (newToken) {
+          setToken(newToken)
+          if (refreshResp.refresh_token) {
+            setRefreshToken(refreshResp.refresh_token)
+          }
+          // Retry the original request once with new token
+          return apiRequest<T>(endpoint, {
+            ...options,
+            _isRetry: true,
+          } as RequestOptions)
+        }
+      } catch (_) {
+        // Refresh failed, proceed to full logout
+      }
+    }
+
     removeToken()
+    removeRefreshToken()
     throw new Error('Sessiya muddati tugadi, qaytadan tizimga kiring')
   }
 

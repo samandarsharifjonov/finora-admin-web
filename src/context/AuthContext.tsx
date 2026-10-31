@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { apiRequest, getToken, removeToken, setToken } from '../lib/api'
+import { apiRequest, getToken, removeToken, setToken, setRefreshToken, removeRefreshToken } from '../lib/api'
 import type { User } from '../types'
 
 interface AuthContextType {
@@ -7,7 +7,7 @@ interface AuthContextType {
   token: string | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
-  loginWithQr: (token: string, user: User) => void
+  loginWithQr: (token: string, user: User, refreshToken?: string) => void
   logout: () => void
   refreshUser: () => Promise<void>
   hasPermission: (permission: string) => boolean
@@ -62,7 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
 
       const authData = resp?.data || resp
-      const token = authData?.token
+      const token = authData?.access_token || authData?.token
+      const refreshToken = authData?.refresh_token
       const user = authData?.user
 
       if (!token || !user) {
@@ -85,6 +86,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (_) {}
 
       setToken(token)
+      if (refreshToken) {
+        setRefreshToken(refreshToken)
+      }
       setTokenState(token)
       setUser(user)
     } finally {
@@ -92,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const loginWithQr = (token: string, user: User) => {
+  const loginWithQr = (token: string, user: User, refreshToken?: string) => {
     const hasAdminPanelAccess = user.is_super_admin || user.permissions?.includes('admin_panel.access')
     if (!hasAdminPanelAccess) {
       throw new Error("Kechirasiz, sizga Admin panelga kirish ruxsati berilmagan!")
@@ -103,12 +107,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('finora_last_activity', Date.now().toString())
     } catch (_) {}
     setToken(token)
+    if (refreshToken) {
+      setRefreshToken(refreshToken)
+    }
     setTokenState(token)
     setUser(user)
   }
 
   const logout = () => {
     removeToken()
+    removeRefreshToken()
     try {
       sessionStorage.removeItem('finora_screen_locked')
       localStorage.removeItem('finora_screen_locked')
