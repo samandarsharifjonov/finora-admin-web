@@ -230,3 +230,31 @@ export async function fetchAdminUnreadCount(): Promise<number> {
     return 0
   }
 }
+
+export interface BroadcastSupportPayload {
+  target_audience: 'all' | 'active_30d' | 'active_7d' | 'with_chats'
+  message_type: 'text' | 'image'
+  text: string
+  media_url?: string
+}
+
+export interface BroadcastSupportResponse {
+  target_audience: string
+  total_targeted: number
+  total_sent: number
+  failed_count: number
+  message: string
+}
+
+/**
+ * Barcha yoki tanlangan foydalanuvchilarning shaxsiy support chatiga umumiy xabar yuborish
+ */
+export async function broadcastSupportMessage(
+  payload: BroadcastSupportPayload
+): Promise<BroadcastSupportResponse> {
+  const res = await apiRequest<any>('/admin/support/broadcast', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+  return res?.data || res
+}

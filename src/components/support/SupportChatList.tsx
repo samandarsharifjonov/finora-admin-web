@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Ban,
   Radio,
+  Megaphone,
 } from 'lucide-react'
 import type { SupportChat, SupportStatsSummary } from '../../types/support'
 import type { FilterTab } from '../../hooks/useSupportChats'
@@ -26,6 +27,7 @@ interface SupportChatListProps {
   refreshing: boolean
   onRefresh: () => void
   onSelectChat: (userId: number) => void
+  onOpenBroadcast: () => void
 }
 
 export const SupportChatList: React.FC<SupportChatListProps> = ({
@@ -41,6 +43,7 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
   refreshing,
   onRefresh,
   onSelectChat,
+  onOpenBroadcast,
 }) => {
   const renderMessageIcon = (type: string, isActive: boolean) => {
     const iconClass = `h-3.5 w-3.5 shrink-0 ${
@@ -73,6 +76,16 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5">
+            {/* Broadcast Button */}
+            <button
+              onClick={onOpenBroadcast}
+              title="Barcha foydalanuvchilar chatiga umumiy xabar yuborish"
+              className="flex items-center gap-1.5 rounded-lg bg-finora-600 hover:bg-finora-700 px-2 py-1 text-[11px] font-bold text-white shadow-2xs transition-colors shrink-0"
+            >
+              <Megaphone className="h-3 w-3" />
+              <span className="hidden sm:inline">Umumiy xabar</span>
+            </button>
+
             {/* Live Socket badge */}
             <span
               title={socketStatus === 'connected' ? 'Real-time WebSocket ulangan' : 'Sinxron rejim'}
@@ -83,7 +96,7 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
               }`}
             >
               <Radio className={`h-3 w-3 ${socketStatus === 'connected' ? 'animate-pulse text-emerald-600' : ''}`} />
-              <span className="hidden sm:inline">
+              <span className="hidden lg:inline">
                 {socketStatus === 'connected' ? 'Jonli' : 'Sinxron'}
               </span>
             </span>

@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MessageSquare, ShieldCheck, Sparkles, Headphones } from 'lucide-react'
+import { MessageSquare, ShieldCheck, Sparkles, Headphones, Megaphone } from 'lucide-react'
 import { useSupportChats } from '../hooks/useSupportChats'
 import { SupportChatList } from '../components/support/SupportChatList'
 import { SupportChatView } from '../components/support/SupportChatView'
+import { BroadcastSupportModal } from '../components/support/BroadcastSupportModal'
 
 export const SupportPage: React.FC = () => {
   const { userId: rawUserId } = useParams<{ userId?: string }>()
   const navigate = useNavigate()
   const activeUserId = rawUserId ? Number(rawUserId) : null
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false)
 
   const {
     chats,
@@ -54,6 +56,7 @@ export const SupportPage: React.FC = () => {
             refreshing={refreshing}
             onRefresh={refresh}
             onSelectChat={handleSelectChat}
+            onOpenBroadcast={() => setIsBroadcastOpen(true)}
           />
         </div>
 
@@ -88,6 +91,15 @@ export const SupportPage: React.FC = () => {
                 Foydalanuvchi bilan jonli muloqotni boshlash, xabarlar tarixini ko'rish va javob qaytarish uchun chap tarafdagi ro'yxatdan birorta suhbat ustiga bosing.
               </p>
 
+              <button
+                type="button"
+                onClick={() => setIsBroadcastOpen(true)}
+                className="mt-4 flex items-center gap-2 rounded-xl bg-finora-600 hover:bg-finora-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors"
+              >
+                <Megaphone className="h-4 w-4" />
+                <span>Barchaga umumiy xabar yuborish</span>
+              </button>
+
               <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
                 <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-600 shadow-2xs dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300">
                   <MessageSquare className="h-3.5 w-3.5 text-finora-600" />
@@ -102,6 +114,15 @@ export const SupportPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Broadcast Support Modal */}
+      <BroadcastSupportModal
+        isOpen={isBroadcastOpen}
+        onClose={() => setIsBroadcastOpen(false)}
+        onSuccess={() => {
+          refresh()
+        }}
+      />
     </div>
   )
 }
