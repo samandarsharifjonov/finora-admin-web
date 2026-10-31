@@ -23,7 +23,7 @@ import { DateRangePicker } from '../components/common/DateRangePicker'
 export const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<AdminUserListItem[]>([])
   const [total, setTotal] = useState(0)
-  const [limit] = useState(20)
+  const [limit] = useState(30)
   const [offset, setOffset] = useState(0)
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')

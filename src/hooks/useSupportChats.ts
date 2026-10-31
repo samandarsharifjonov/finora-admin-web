@@ -31,7 +31,7 @@ export function useSupportChats() {
     setError(null)
 
     try {
-      const res = await fetchAdminChats({ search, page: 1, limit: 100 })
+      const res = await fetchAdminChats({ search, page: 1, limit: 30 })
       setChats(res.chats)
       setTotal(res.total)
       setPage(1)
@@ -49,7 +49,7 @@ export function useSupportChats() {
     setLoadingMore(true)
     const nextPage = page + 1
     try {
-      const res = await fetchAdminChats({ search, page: nextPage, limit: 100 })
+      const res = await fetchAdminChats({ search, page: nextPage, limit: 30 })
       setChats(prev => {
         const existingIds = new Set(prev.map(c => c.id))
         const newUnique = res.chats.filter(c => !existingIds.has(c.id))
