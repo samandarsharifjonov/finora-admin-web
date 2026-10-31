@@ -39,8 +39,11 @@ export const AppUpdatePage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await apiRequest<{ success: boolean; data: AppUpdateConfig }>('/admin/app/version')
-      const data = res?.data || res
+      const res = await apiRequest<any>('/admin/app/version')
+      let data = res?.data || res
+      while (data && data.data && typeof data.data === 'object') {
+        data = data.data
+      }
       if (data) {
         setConfig(data)
         setVersion(data.latest_version || '1.2.0+26')
@@ -106,7 +109,10 @@ export const AppUpdatePage: React.FC = () => {
         body: JSON.stringify(payload),
       })
 
-      const updated = res?.data || payload
+      let updated: any = res?.data || res || payload
+      while (updated && updated.data && typeof updated.data === 'object') {
+        updated = updated.data
+      }
       setConfig(updated)
       setSuccessMsg("Ilova yangilanish sozlamalari muvaffaqiyatli saqlandi!")
       setTimeout(() => setSuccessMsg(null), 5000)
