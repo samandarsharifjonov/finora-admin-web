@@ -24,6 +24,7 @@ import { useAuth } from '../context/AuthContext'
 import type { AdminUserDetail } from '../types'
 import { formatCurrency, formatCompactCurrency, formatCurrencyParts, formatDate } from '../lib/utils'
 import { UserAvatar } from '../components/common/UserAvatar'
+import { TelegramIcon } from '../components/common/TelegramIcon'
 import {
   SparklineChart,
   GroupedBarChart,
@@ -378,6 +379,24 @@ export const UserDetailPage: React.FC = () => {
                 <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-dark-cardSecondary dark:text-slate-300">
                   Kirish: {user.auth_provider || 'Email'}
                 </span>
+                {user.telegram_chat_id ? (
+                  <a
+                    href={user.telegram_username ? `https://t.me/${user.telegram_username.replace(/^@/, '')}` : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-0.5 text-[10px] font-bold text-[#229ED9] hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-300 transition-colors border border-sky-200 dark:border-sky-800"
+                    title={`Telegram Chat ID: ${user.telegram_chat_id}`}
+                    onClick={(e) => { if (!user.telegram_username) e.preventDefault() }}
+                  >
+                    <TelegramIcon className="h-3 w-3" />
+                    <span>Telegram: {user.telegram_username ? `@${user.telegram_username.replace(/^@/, '')}` : `ID: ${user.telegram_chat_id}`}</span>
+                  </a>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] text-slate-400 dark:bg-dark-cardSecondary dark:text-slate-500">
+                    <TelegramIcon className="h-3 w-3 opacity-50" />
+                    <span>Telegram ulanmagan</span>
+                  </span>
+                )}
                 {user.last_activity_at && (
                   <span className="text-[10px] text-slate-400">
                     Oxirgi tashrif: {formatDate(user.last_activity_at)}
@@ -658,6 +677,53 @@ export const UserDetailPage: React.FC = () => {
             <h2 className="font-bold text-sm text-slate-900 dark:text-white">
               Ulangan qurilmalar tafsiloti ({user.devices?.length || 0})
             </h2>
+          </div>
+
+          {/* Telegram Bot Connection Box */}
+          <div className="mb-4 mt-3 rounded-xl border border-sky-100 bg-sky-50/70 p-3.5 dark:border-sky-900/40 dark:bg-sky-950/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#229ED9] text-white shadow-sm">
+                  <TelegramIcon className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white">
+                    <span>Finora Telegram Boti</span>
+                    {user.telegram_chat_id ? (
+                      <span className="rounded bg-emerald-100 px-1.5 py-0.2 text-[9.5px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                        Ulangan
+                      </span>
+                    ) : (
+                      <span className="rounded bg-slate-200 px-1.5 py-0.2 text-[9.5px] font-semibold text-slate-600 dark:bg-dark-cardSecondary dark:text-slate-400">
+                        Ulanmagan
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {user.telegram_chat_id
+                      ? `Telegram Chat ID: ${user.telegram_chat_id}`
+                      : "Foydalanuvchi hisobini hali Telegram botga ulamagan"}
+                  </p>
+                </div>
+              </div>
+
+              {user.telegram_chat_id && (
+                user.telegram_username ? (
+                  <a
+                    href={`https://t.me/${user.telegram_username.replace(/^@/, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-lg bg-[#229ED9] px-2.5 py-1 text-xs font-bold text-white shadow-sm hover:bg-[#1e8bc2] transition-colors"
+                  >
+                    <span>@{user.telegram_username.replace(/^@/, '')}</span>
+                  </a>
+                ) : (
+                  <span className="rounded-lg bg-sky-100 dark:bg-sky-900/40 px-2 py-1 text-xs font-bold text-[#229ED9]">
+                    ID: {user.telegram_chat_id}
+                  </span>
+                )
+              )}
+            </div>
           </div>
 
           <div className="mt-3 divide-y divide-slate-100 dark:divide-dark-border/60 max-h-[440px] overflow-y-auto pr-1">

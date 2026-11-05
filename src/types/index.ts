@@ -36,6 +36,7 @@ export interface AdminOverview {
   income_this_month?: number
   expense_this_month?: number
   total_deleted_accounts?: number
+  total_telegram_users?: number
   // Convenient fields
   dau?: number
   mau?: number
@@ -67,6 +68,8 @@ export interface AdminUserListItem {
   joined_at?: string
   last_activity_at?: string | null
   created_at?: string
+  telegram_chat_id?: number | null
+  telegram_username?: string
 }
 
 export interface AdminUserListResponse {
@@ -145,6 +148,8 @@ export interface AdminUserDetail {
   joined_at?: string
   last_activity_at?: string | null
   created_at?: string
+  telegram_chat_id?: number | null
+  telegram_username?: string
 }
 
 export interface CategoryStatItem {

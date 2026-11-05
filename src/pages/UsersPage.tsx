@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   Search,
   Shield,
@@ -19,8 +19,12 @@ import type { AdminUserListItem, AdminUserListResponse } from '../types'
 import { formatCurrency, formatDate } from '../lib/utils'
 import { UserAvatar } from '../components/common/UserAvatar'
 import { DateRangePicker } from '../components/common/DateRangePicker'
+import { TelegramIcon } from '../components/common/TelegramIcon'
 
 export const UsersPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialPlatform = searchParams.get('platform') || 'all'
+
   const [users, setUsers] = useState<AdminUserListItem[]>([])
   const [total, setTotal] = useState(0)
   const [limit] = useState(30)
@@ -30,6 +34,7 @@ export const UsersPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('active')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [platform, setPlatform] = useState(initialPlatform)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,6 +55,7 @@ export const UsersPage: React.FC = () => {
           sort_by: sortBy,
           start_date: startDate || undefined,
           end_date: endDate || undefined,
+          platform: platform !== 'all' ? platform : undefined,
         },
       })
       setUsers(res.users || [])
@@ -63,7 +69,21 @@ export const UsersPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers()
-  }, [offset, search, sortBy, startDate, endDate])
+  }, [offset, search, sortBy, startDate, endDate, platform])
+
+  const handlePlatformChange = (newPlatform: string) => {
+    setOffset(0)
+    setPlatform(newPlatform)
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      if (newPlatform && newPlatform !== 'all') {
+        next.set('platform', newPlatform)
+      } else {
+        next.delete('platform')
+      }
+      return next
+    })
+  }
 
   const handleDateChange = (start: string, end: string) => {
     setOffset(0)
@@ -159,6 +179,16 @@ export const UsersPage: React.FC = () => {
             />
 
             <select
+              value={platform}
+              onChange={e => handlePlatformChange(e.target.value)}
+              className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-xs font-semibold text-slate-700 outline-none dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300"
+            >
+              <option value="all">Barcha manbalar</option>
+              <option value="telegram">Telegram Bot foydalanuvchilari</option>
+              <option value="app">Faqat Mobil ilova</option>
+            </select>
+
+            <select
               value={sortBy}
               onChange={e => {
                 setSortBy(e.target.value)
@@ -174,25 +204,41 @@ export const UsersPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Active Date Filter Chip */}
-        {Boolean(startDate || endDate) && (
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-dark-border/60 text-xs">
-            <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">Faol filtr:</span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-finora-200 bg-finora-50/80 px-2.5 py-1 text-xs font-bold text-finora-700 dark:border-finora-800 dark:bg-finora-950/40 dark:text-finora-300">
-              <span>
-                {startDate === endDate
-                  ? `${startDate} kuni tizimga kirganlar`
-                  : `${startDate || '...'} dan ${endDate || '...'} gacha tizimga kirganlar`}
+        {/* Active Filters (Date & Platform) */}
+        {(Boolean(startDate || endDate) || platform !== 'all') && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-dark-border/60 text-xs">
+            <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">Faol filtrlar:</span>
+            {Boolean(startDate || endDate) && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-finora-200 bg-finora-50/80 px-2.5 py-1 text-xs font-bold text-finora-700 dark:border-finora-800 dark:bg-finora-950/40 dark:text-finora-300">
+                <span>
+                  {startDate === endDate
+                    ? `${startDate} kuni tizimga kirganlar`
+                    : `${startDate || '...'} dan ${endDate || '...'} gacha tizimga kirganlar`}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleDateChange('', '')}
+                  className="rounded-full p-0.5 hover:bg-finora-200/70 dark:hover:bg-finora-900"
+                  title="Sana filtrini olib tashlash"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </span>
-              <button
-                type="button"
-                onClick={() => handleDateChange('', '')}
-                className="rounded-full p-0.5 hover:bg-finora-200/70 dark:hover:bg-finora-900"
-                title="Sana filtrini olib tashlash"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
+            )}
+            {platform !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-sky-200 bg-sky-50/80 px-2.5 py-1 text-xs font-bold text-[#229ED9] dark:border-sky-900/60 dark:bg-sky-950/40 dark:text-sky-300">
+                <TelegramIcon className="h-3 w-3" />
+                <span>{platform === 'telegram' ? 'Faqat Telegram Bot foydalanuvchilari' : 'Faqat Mobil ilova'}</span>
+                <button
+                  type="button"
+                  onClick={() => handlePlatformChange('all')}
+                  className="rounded-full p-0.5 hover:bg-sky-200/70 dark:hover:bg-sky-900"
+                  title="Platforma filtrini olib tashlash"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -280,8 +326,23 @@ export const UsersPage: React.FC = () => {
                                 </span>
                               )}
                             </div>
-                            <div className="truncate text-[11px] text-slate-400">
-                              {u.email}
+                            <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                              <span className="truncate text-[11px] text-slate-400">
+                                {u.email}
+                              </span>
+                              {u.telegram_chat_id && (
+                                <a
+                                  href={u.telegram_username ? `https://t.me/${u.telegram_username.replace(/^@/, '')}` : undefined}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 rounded bg-sky-50 px-1.5 py-0.5 text-[9.5px] font-bold text-[#229ED9] hover:bg-sky-100 dark:bg-sky-950/60 dark:text-sky-300 transition-colors shrink-0"
+                                  title={`Telegram Chat ID: ${u.telegram_chat_id}`}
+                                  onClick={(e) => { if (!u.telegram_username) e.preventDefault() }}
+                                >
+                                  <TelegramIcon className="h-2.5 w-2.5 shrink-0" />
+                                  <span>{u.telegram_username ? `@${u.telegram_username.replace(/^@/, '')}` : `TG: ${u.telegram_chat_id}`}</span>
+                                </a>
+                              )}
                             </div>
                           </div>
                         </div>
