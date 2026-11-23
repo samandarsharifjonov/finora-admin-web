@@ -19,6 +19,7 @@ import { apiRequest } from '../lib/api'
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../lib/security'
 import { FinoraQRCode } from '../components/common/FinoraQRCode'
 import { InteractiveDotsBackground } from '../components/common/InteractiveDotsBackground'
+import { TiltCard } from '../components/common/TiltCard'
 import type { User } from '../types'
 
 interface QRGenerateResponse {
@@ -253,9 +254,9 @@ export const LoginPage: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex flex-1 items-center justify-center p-4 sm:p-6 my-auto">
-        <div className="w-full max-w-[420px]">
-          {/* Minimalist Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 sm:p-8 shadow-2xl shadow-slate-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-dark-card/90 dark:shadow-black/50 transition-all">
+        <TiltCard className="w-full max-w-[420px]">
+          {/* Minimalist Glass Card */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 sm:p-8 backdrop-blur-xl dark:border-white/10 dark:bg-dark-card/90 transition-all">
             {/* Header: in QR mode, no big logo above */}
             <div className="text-center">
               {authMode === 'password' && (
@@ -457,7 +458,7 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
+        </TiltCard>
       </main>
 
       {/* Footer without extra text */}
