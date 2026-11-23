@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext'
 import { apiRequest } from '../lib/api'
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../lib/security'
 import { FinoraQRCode } from '../components/common/FinoraQRCode'
+import { InteractiveDotsBackground } from '../components/common/InteractiveDotsBackground'
 import type { User } from '../types'
 
 interface QRGenerateResponse {
@@ -218,8 +219,8 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-dark-bg dark:text-slate-100 transition-colors duration-300">
-      {/* Ambient Subtle Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-dot-pattern-light dark:bg-dot-pattern-dark opacity-50" />
+      {/* Interactive Physics Dot-Matrix Background */}
+      <InteractiveDotsBackground />
 
       {/* Top Navbar */}
       <header className="relative z-10 flex h-16 w-full items-center justify-between px-5 sm:px-8 border-b border-slate-200/60 dark:border-white/5 backdrop-blur-md">
