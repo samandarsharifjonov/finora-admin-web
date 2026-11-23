@@ -12,7 +12,6 @@ import {
   KeyRound,
   Sun,
   Moon,
-  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -219,33 +218,21 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-dark-bg dark:text-slate-100 transition-colors duration-300">
-      {/* Ambient Radial Glow & Dot-Matrix Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-dot-pattern-light dark:bg-dot-pattern-dark opacity-60" />
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-b from-finora-500/15 via-emerald-500/5 to-transparent blur-3xl opacity-80" />
+      {/* Ambient Subtle Background */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-dot-pattern-light dark:bg-dot-pattern-dark opacity-50" />
 
       {/* Top Navbar */}
       <header className="relative z-10 flex h-16 w-full items-center justify-between px-5 sm:px-8 border-b border-slate-200/60 dark:border-white/5 backdrop-blur-md">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <div className="relative flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs">
             <img src={logoUrl} alt="Finora" className="h-full w-full object-cover" />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-black tracking-tight text-slate-900 dark:text-white">
-              FINORA
-            </span>
-            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-finora-500/30 bg-finora-500/10 px-2 py-0.5 text-[10px] font-bold text-finora-700 dark:text-finora-400">
-              <Sparkles className="h-2.5 w-2.5" /> Admin OS
-            </span>
-          </div>
+          <span className="text-sm font-black tracking-tight text-slate-900 dark:text-white">
+            FINORA
+          </span>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Security Status Badge */}
-          <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-dark-card/70 dark:text-slate-300">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>256-bit E2EE Himoyalangan</span>
-          </div>
-
           {/* Theme Toggle Button */}
           <button
             type="button"
@@ -265,28 +252,29 @@ export const LoginPage: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex flex-1 items-center justify-center p-4 sm:p-6 my-auto">
-        <div className="w-full max-w-[430px]">
-          {/* Minimalist Glassmorphic Card */}
+        <div className="w-full max-w-[420px]">
+          {/* Minimalist Card */}
           <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 sm:p-8 shadow-2xl shadow-slate-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-dark-card/90 dark:shadow-black/50 transition-all">
-            {/* Top Logo & Title */}
+            {/* Header: in QR mode, no big logo above */}
             <div className="text-center">
-              <div className="relative mx-auto inline-block">
-                <div className="absolute -inset-1 rounded-2xl bg-finora-500/25 blur-md" />
-                <img
-                  src={logoUrl}
-                  alt="Finora"
-                  className="relative mx-auto h-13 w-13 rounded-2xl object-cover border border-slate-200/90 dark:border-white/10 shadow-sm"
-                />
-              </div>
-              <h1 className="mt-4 text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              {authMode === 'password' && (
+                <div className="relative mx-auto inline-block mb-2">
+                  <img
+                    src={logoUrl}
+                    alt="Finora"
+                    className="h-11 w-11 rounded-xl object-cover border border-slate-200/90 dark:border-white/10 shadow-xs"
+                  />
+                </div>
+              )}
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                 Finora Admin Hub
               </h1>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Boshqaruv va audit tizimiga xavfsiz avtorizatsiya
+                Boshqaruv va tahlillar tizimiga xavfsiz kirish
               </p>
             </div>
 
-            {/* Segmented Tab Switcher */}
+            {/* Segmented Tab Switcher without any "Tezkor" badge */}
             <div className="mt-6 flex rounded-2xl border border-slate-200/90 bg-slate-100/80 p-1 dark:border-white/5 dark:bg-slate-900/60">
               <button
                 type="button"
@@ -299,9 +287,6 @@ export const LoginPage: React.FC = () => {
               >
                 <Smartphone className="h-3.5 w-3.5 text-finora-600 dark:text-finora-400" />
                 <span>QR Kod</span>
-                <span className="rounded-full bg-finora-500/20 px-1.5 py-0.2 text-[9.5px] font-black text-finora-800 dark:text-finora-300">
-                  Tezkor
-                </span>
               </button>
 
               <button
@@ -314,14 +299,14 @@ export const LoginPage: React.FC = () => {
                 }`}
               >
                 <KeyRound className="h-3.5 w-3.5" />
-                <span>Parol orqali</span>
+                <span>Parol</span>
               </button>
             </div>
 
             {/* TAB 1: QR CODE AUTH */}
             {authMode === 'qr' && (
               <div className="mt-6 flex flex-col items-center animate-in fade-in duration-200">
-                {/* Styled Finora QR Code */}
+                {/* Styled Rounded-Dot QR Code matching reference */}
                 <FinoraQRCode
                   token={qrToken}
                   isLoading={qrLoading}
@@ -331,7 +316,7 @@ export const LoginPage: React.FC = () => {
                   timeLeft={timeLeft}
                   totalTime={60}
                   onRefresh={generateQr}
-                  size={195}
+                  size={200}
                 />
 
                 {/* Minimalist 3-Step Scan Guide */}
@@ -474,16 +459,9 @@ export const LoginPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer without extra text */}
       <footer className="relative z-10 py-5 text-center text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/40 dark:border-white/5">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4">
-          <span>Finora Financial OS &copy; 2026</span>
-          <span className="hidden sm:inline opacity-40">•</span>
-          <span className="flex items-center gap-1 text-[11px]">
-            <ShieldCheck className="h-3.5 w-3.5 text-finora-500" />
-            2FA Biometrik &amp; End-to-End Shifrlangan
-          </span>
-        </div>
+        <span>Finora Financial OS &copy; 2026</span>
       </footer>
     </div>
   )
