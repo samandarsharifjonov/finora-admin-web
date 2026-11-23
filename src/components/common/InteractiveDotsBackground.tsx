@@ -11,6 +11,16 @@ interface Dot {
   baseRadius: number
 }
 
+interface Shockwave {
+  x: number
+  y: number
+  currentRadius: number
+  maxRadius: number
+  speed: number
+  thickness: number
+  force: number
+}
+
 export const InteractiveDotsBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const { theme } = useTheme()
@@ -25,6 +35,7 @@ export const InteractiveDotsBackground: React.FC = () => {
     let width = 0
     let height = 0
     const dots: Dot[] = []
+    const shockwaves: Shockwave[] = []
 
     const SPACING = 30
     const REPEL_RADIUS = 110
@@ -69,6 +80,24 @@ export const InteractiveDotsBackground: React.FC = () => {
       }
     }
 
+    const triggerShockwave = (x: number, y: number) => {
+      // Create new expanding shockwave ripple
+      shockwaves.push({
+        x,
+        y,
+        currentRadius: 0,
+        maxRadius: Math.max(width, height) * 0.7,
+        speed: 13,
+        thickness: 45,
+        force: 16,
+      })
+
+      // Limit max concurrent shockwaves to keep 60 FPS silky smooth
+      if (shockwaves.length > 5) {
+        shockwaves.shift()
+      }
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX
       mouseY = e.clientY
@@ -81,11 +110,25 @@ export const InteractiveDotsBackground: React.FC = () => {
       isMouseActive = false
     }
 
+    const handleMouseDown = (e: MouseEvent) => {
+      triggerShockwave(e.clientX, e.clientY)
+    }
+
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length > 0) {
         mouseX = e.touches[0].clientX
         mouseY = e.touches[0].clientY
         isMouseActive = true
+      }
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0]
+        mouseX = touch.clientX
+        mouseY = touch.clientY
+        isMouseActive = true
+        triggerShockwave(touch.clientX, touch.clientY)
       }
     }
 
@@ -97,8 +140,10 @@ export const InteractiveDotsBackground: React.FC = () => {
 
     window.addEventListener('resize', initDots)
     window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mousedown', handleMouseDown)
     document.addEventListener('mouseleave', handleMouseLeave)
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchend', handleTouchEnd)
 
     initDots()
@@ -107,11 +152,53 @@ export const InteractiveDotsBackground: React.FC = () => {
 
     // Colors
     const defaultDotColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(148, 163, 184, 0.35)'
-    const activeDotColor = isDark ? 'rgba(146, 223, 79, 0.65)' : 'rgba(112, 196, 40, 0.6)'
+    const activeDotColor = isDark ? 'rgba(146, 223, 79, 0.7)' : 'rgba(112, 196, 40, 0.65)'
 
     const render = () => {
       ctx.clearRect(0, 0, width, height)
 
+      // 1. Update and render active shockwaves
+      for (let w = shockwaves.length - 1; w >= 0; w--) {
+        const wave = shockwaves[w]
+        wave.currentRadius += wave.speed
+
+        const progress = wave.currentRadius / wave.maxRadius
+        const waveOpacity = Math.max(0, 1 - progress)
+
+        if (progress >= 1) {
+          shockwaves.splice(w, 1)
+          continue
+        }
+
+        // Draw visual neon shockwave ring
+        ctx.beginPath()
+        ctx.arc(wave.x, wave.y, wave.currentRadius, 0, Math.PI * 2)
+        ctx.strokeStyle = isDark
+          ? `rgba(146, 223, 79, ${waveOpacity * 0.28})`
+          : `rgba(112, 196, 40, ${waveOpacity * 0.22})`
+        ctx.lineWidth = 2.5
+        ctx.stroke()
+
+        // Apply radial outward displacement to dots along the shockwave crest
+        for (let i = 0; i < dots.length; i++) {
+          const dot = dots[i]
+          const dx = dot.x - wave.x
+          const dy = dot.y - wave.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          const diff = dist - wave.currentRadius
+
+          if (Math.abs(diff) < wave.thickness) {
+            const pushFactor =
+              (1 - Math.abs(diff) / wave.thickness) * wave.force * waveOpacity
+            const nx = dx / (dist || 1)
+            const ny = dy / (dist || 1)
+            dot.vx += nx * pushFactor
+            dot.vy += ny * pushFactor
+          }
+        }
+      }
+
+      // 2. Update and render dots
       for (let i = 0; i < dots.length; i++) {
         const dot = dots[i]
 
@@ -143,12 +230,18 @@ export const InteractiveDotsBackground: React.FC = () => {
         dot.x += dot.vx
         dot.y += dot.vy
 
-        // Draw dot
+        // Draw dot with dynamic neon color when displaced
         const distFromOrigin = Math.sqrt(homeDx * homeDx + homeDy * homeDy)
         const isDisplaced = distFromOrigin > 1
 
         ctx.beginPath()
-        ctx.arc(dot.x, dot.y, isDisplaced ? dot.baseRadius * 1.3 : dot.baseRadius, 0, Math.PI * 2)
+        ctx.arc(
+          dot.x,
+          dot.y,
+          isDisplaced ? dot.baseRadius * 1.35 : dot.baseRadius,
+          0,
+          Math.PI * 2
+        )
         ctx.fillStyle = isDisplaced ? activeDotColor : defaultDotColor
         ctx.fill()
       }
@@ -161,8 +254,10 @@ export const InteractiveDotsBackground: React.FC = () => {
     return () => {
       window.removeEventListener('resize', initDots)
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('mouseleave', handleMouseLeave)
       window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchend', handleTouchEnd)
       cancelAnimationFrame(animationFrameId)
     }
