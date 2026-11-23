@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
-import { Lock, RefreshCw, LogOut, CheckCircle2, ShieldCheck, KeyRound, ShieldAlert, AlertTriangle } from 'lucide-react'
+import { FinoraQRCode } from '../common/FinoraQRCode'
+import { Lock, LogOut, CheckCircle2, ShieldCheck, KeyRound, ShieldAlert, AlertTriangle } from 'lucide-react'
 import { apiRequest } from '../../lib/api'
 import { useAuth } from '../../context/AuthContext'
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../../lib/security'
@@ -419,59 +419,29 @@ export const AutoLockOverlay: React.FC = () => {
           </div>
         ) : !showPasswordInput ? (
           /* QR Unlock Mode */
-          <div className="mt-4 space-y-3.5">
-            <div className="relative mx-auto flex h-48 w-48 items-center justify-center rounded-2xl border border-slate-200 bg-white p-3 shadow-inner dark:border-dark-border">
-              {qrToken && !isExpired ? (
-                <QRCodeSVG
-                  value={`finora_qr:${qrToken}`}
-                  size={168}
-                  level="M"
-                  includeMargin={false}
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center gap-2 p-4 text-slate-400">
-                  <RefreshCw className="h-8 w-8 text-slate-400 animate-spin" />
-                  <span className="text-xs">Yuklanmoqda...</span>
-                </div>
-              )}
+          <div className="mt-4 space-y-3 flex flex-col items-center">
+            <FinoraQRCode
+              token={qrToken}
+              isLoading={!qrToken && !isExpired}
+              isExpired={isExpired}
+              isSuccess={isSuccess}
+              timeLeft={timeLeft}
+              totalTime={60}
+              onRefresh={generateQr}
+              size={160}
+            />
 
-              {/* Expired overlay */}
-              {isExpired && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-white/95 backdrop-blur-xs p-4 dark:bg-dark-card/95">
-                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    QR kod muddati tugadi
-                  </p>
-                  <button
-                    onClick={generateQr}
-                    className="mt-3 flex items-center gap-1.5 rounded-xl bg-finora-500 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-sm hover:bg-finora-400"
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" /> Yangilash
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Countdown timer & Security note */}
-            {!isExpired && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400">
-                  <ShieldCheck className="h-3.5 w-3.5 text-finora-500" />
-                  <span>
-                    Finora mobil ilovasida skanerlang (<strong className="text-slate-900 dark:text-white">{timeLeft}s</strong>)
-                  </span>
-                </div>
-                {user?.is_super_admin && (
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500">
-                    Oddiy adminlar skaner qilganda kirish avtomatik ravishda rad etiladi
-                  </p>
-                )}
-              </div>
+            {/* Security note */}
+            {!isExpired && user?.is_super_admin && (
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                Oddiy adminlar skaner qilganda kirish avtomatik ravishda rad etiladi
+              </p>
             )}
 
             {/* Switch to password */}
             <button
               onClick={() => setShowPasswordInput(true)}
-              className="mt-2 flex items-center justify-center gap-1 text-xs font-semibold text-finora-600 hover:underline dark:text-finora-400 mx-auto"
+              className="mt-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-finora-600 hover:underline dark:text-finora-400"
             >
               <KeyRound className="h-3.5 w-3.5" /> Parol bilan ochish
             </button>

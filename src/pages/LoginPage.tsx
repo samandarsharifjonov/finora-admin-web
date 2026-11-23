@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { QRCodeSVG } from 'qrcode.react'
 import {
   Eye,
   EyeOff,
@@ -8,14 +7,18 @@ import {
   Mail,
   AlertCircle,
   ArrowRight,
-  RefreshCw,
-  CheckCircle2,
-  QrCode,
   ShieldCheck,
+  Smartphone,
+  KeyRound,
+  Sun,
+  Moon,
+  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import { apiRequest } from '../lib/api'
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../lib/security'
+import { FinoraQRCode } from '../components/common/FinoraQRCode'
 import type { User } from '../types'
 
 interface QRGenerateResponse {
@@ -36,6 +39,7 @@ interface QRStatusResponse {
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
   const { user, token, login, loginWithQr } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   // Auto-redirect to dashboard if already logged in
   useEffect(() => {
@@ -179,7 +183,7 @@ export const LoginPage: React.FC = () => {
     return () => clearInterval(timer)
   }, [cooldownSeconds])
 
-  // Password login handler with military-grade rate limiting
+  // Password login handler with rate limiting
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (cooldownSeconds > 0) {
@@ -214,253 +218,273 @@ export const LoginPage: React.FC = () => {
   const logoUrl = `${import.meta.env.BASE_URL}logo.png`
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 p-4 dark:bg-dark-bg sm:p-6">
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-7 shadow-sm dark:border-dark-border dark:bg-dark-card sm:p-9">
-          {/* Logo & Header */}
-          <div className="text-center">
-            <img
-              src={logoUrl}
-              alt="Finora"
-              className="mx-auto h-14 w-14 rounded-2xl object-cover border border-slate-200/80 dark:border-dark-border"
-            />
-            <h1 className="mt-3.5 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              Finora Admin Hub
-            </h1>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Boshqaruv va tahlillar tizimiga xavfsiz kirish
-            </p>
+    <div className="relative min-h-screen w-full flex flex-col justify-between overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-dark-bg dark:text-slate-100 transition-colors duration-300">
+      {/* Ambient Radial Glow & Dot-Matrix Background */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-dot-pattern-light dark:bg-dot-pattern-dark opacity-60" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-gradient-to-b from-finora-500/15 via-emerald-500/5 to-transparent blur-3xl opacity-80" />
+
+      {/* Top Navbar */}
+      <header className="relative z-10 flex h-16 w-full items-center justify-between px-5 sm:px-8 border-b border-slate-200/60 dark:border-white/5 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs">
+            <img src={logoUrl} alt="Finora" className="h-full w-full object-cover" />
           </div>
-
-          {/* MODE 1: QR Code Login (Default & Recommended) */}
-          {authMode === 'qr' && (
-            <div className="mt-6">
-              {qrError && (
-                <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50/80 p-3 text-xs text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
-                  <span className="font-medium">{qrError}</span>
-                </div>
-              )}
-
-              {/* QR Container */}
-              <div className="relative mx-auto flex h-60 w-60 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white p-4 dark:border-dark-border">
-                {isQrSuccess ? (
-                  <div className="flex flex-col items-center justify-center py-6 text-emerald-600 dark:text-emerald-400 animate-in zoom-in duration-200">
-                    <CheckCircle2 className="h-16 w-16" />
-                    <span className="mt-3 text-xs font-bold">Tasdiqlandi!</span>
-                  </div>
-                ) : qrLoading ? (
-                  <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
-                    <RefreshCw className="h-7 w-7 animate-spin text-finora-500" />
-                    <span className="text-[11px] font-medium">QR kod tayyorlanmoqda...</span>
-                  </div>
-                ) : qrToken && !isQrExpired ? (
-                  <QRCodeSVG
-                    value={`finora_qr:${qrToken}`}
-                    size={208}
-                    level="M"
-                    includeMargin={false}
-                  />
-                ) : null}
-
-                {/* Expired overlay */}
-                {isQrExpired && !isQrSuccess && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-white/95 backdrop-blur-xs p-4 text-center dark:bg-dark-card/95">
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                      QR kod muddati tugadi
-                    </p>
-                    <p className="mt-1 text-[11px] text-slate-400">
-                      Xavfsizlik uchun kod 60 soniyada eskiradi
-                    </p>
-                    <button
-                      onClick={generateQr}
-                      className="mt-3 flex items-center gap-1.5 rounded-xl bg-finora-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-sm transition-all hover:bg-finora-600"
-                    >
-                      <RefreshCw className="h-3.5 w-3.5" /> Yangilash
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Countdown badge */}
-              {!isQrExpired && !isQrSuccess && !qrLoading && (
-                <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                  <ShieldCheck className="h-3.5 w-3.5 text-finora-500" />
-                  <span>
-                    Muddati: <strong className="text-slate-900 dark:text-white">{timeLeft} soniya</strong>
-                  </span>
-                </div>
-              )}
-
-              {/* Step-by-step instructions */}
-              <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-dark-border dark:bg-dark-cardSecondary/40 text-[11px] text-slate-600 dark:text-slate-300 space-y-1.5">
-                <div className="flex items-start gap-2">
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-finora-500/20 text-[10px] font-bold text-finora-700 dark:text-finora-400">
-                    1
-                  </span>
-                  <span>Finora mobil ilovasini oching</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-finora-500/20 text-[10px] font-bold text-finora-700 dark:text-finora-400">
-                    2
-                  </span>
-                  <span>
-                    <strong>Profil</strong> &rarr; <strong>Boshqaruv paneli</strong> &rarr; <strong>Admin panelga kirish</strong>
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-finora-500/20 text-[10px] font-bold text-finora-700 dark:text-finora-400">
-                    3
-                  </span>
-                  <span>QR kodni skanerlab, Face ID yoki barmoq izi bilan tasdiqlang</span>
-                </div>
-              </div>
-
-              {/* Switch to password login */}
-              <div className="mt-5 text-center">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('password')}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                >
-                  <Lock className="h-3.5 w-3.5" /> Parol orqali kirish
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* MODE 2: Password Login (Backup fallback) */}
-          {authMode === 'password' && (
-            <div className="mt-6">
-              {cooldownSeconds > 0 ? (
-                <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200 animate-pulse">
-                  <ShieldCheck className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-bold">Xavfsizlik blokirovkasi yoqildi</p>
-                    <p className="text-[11px] opacity-90 mt-0.5">
-                      Ketma-ket xato urinishlar sababli tizim vaqtincha to'xtatildi. Qayta urinish: <strong>{cooldownSeconds} soniya</strong>
-                    </p>
-                  </div>
-                </div>
-              ) : passwordError ? (
-                <div className="mb-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
-                  <div className="flex-1 font-medium">{passwordError}</div>
-                </div>
-              ) : null}
-
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                <div>
-                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Email manzil
-                  </label>
-                  <div className="relative mt-1.5">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                      <Mail className="h-4 w-4" />
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      disabled={cooldownSeconds > 0}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="admin@finora.uz"
-                      required
-                      autoFocus
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-3.5 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white disabled:opacity-50"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Parol
-                  </label>
-                  <div className="relative mt-1.5">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                      <Lock className="h-4 w-4" />
-                    </div>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      disabled={cooldownSeconds > 0}
-                      onChange={e => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50/50 py-2.5 pl-10 pr-10 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/10 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white disabled:opacity-50"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      disabled={cooldownSeconds > 0}
-                      onChange={e => setRememberMe(e.target.checked)}
-                      className="h-4 w-4 rounded border-slate-300 text-finora-600 focus:ring-finora-500/20 dark:border-dark-border dark:bg-dark-cardSecondary"
-                    />
-                    <span className="text-xs text-slate-600 dark:text-slate-400">
-                      Eslab qolish
-                    </span>
-                  </label>
-                  <span className="text-[11px] font-medium text-finora-600 hover:underline dark:text-finora-400">
-                    Faqat Adminlar uchun
-                  </span>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={passwordLoading || cooldownSeconds > 0}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-finora-500/25 transition-all hover:bg-finora-600 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {passwordLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
-                      <span>Tekshirilmoqda...</span>
-                    </div>
-                  ) : cooldownSeconds > 0 ? (
-                    <span>Bloklandi ({cooldownSeconds}s)</span>
-                  ) : (
-                    <>
-                      <span>Tizimga kirish</span>
-                      <ArrowRight className="h-4 w-4 text-slate-950" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Switch back to QR login */}
-              <div className="mt-6 text-center">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('qr')}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-finora-700 hover:underline dark:text-finora-400"
-                >
-                  <QrCode className="h-4 w-4" /> QR kod orqali tezkor kirish
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Footer note */}
-          <div className="mt-8 text-center text-[11px] text-slate-400 dark:text-slate-500">
-            Finora Moliya Boshqaruv Tizimi &copy; 2026
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black tracking-tight text-slate-900 dark:text-white">
+              FINORA
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-finora-500/30 bg-finora-500/10 px-2 py-0.5 text-[10px] font-bold text-finora-700 dark:text-finora-400">
+              <Sparkles className="h-2.5 w-2.5" /> Admin OS
+            </span>
           </div>
         </div>
-      </div>
+
+        <div className="flex items-center gap-3">
+          {/* Security Status Badge */}
+          <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-dark-card/70 dark:text-slate-300">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>256-bit E2EE Himoyalangan</span>
+          </div>
+
+          {/* Theme Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/80 bg-white/80 text-slate-600 shadow-xs backdrop-blur-md transition-all hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-dark-card/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            title="Mavzuni almashtirish"
+            aria-label="Mavzuni almashtirish"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4 text-amber-400" />
+            ) : (
+              <Moon className="h-4 w-4 text-slate-600" />
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="relative z-10 flex flex-1 items-center justify-center p-4 sm:p-6 my-auto">
+        <div className="w-full max-w-[430px]">
+          {/* Minimalist Glassmorphic Card */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 sm:p-8 shadow-2xl shadow-slate-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-dark-card/90 dark:shadow-black/50 transition-all">
+            {/* Top Logo & Title */}
+            <div className="text-center">
+              <div className="relative mx-auto inline-block">
+                <div className="absolute -inset-1 rounded-2xl bg-finora-500/25 blur-md" />
+                <img
+                  src={logoUrl}
+                  alt="Finora"
+                  className="relative mx-auto h-13 w-13 rounded-2xl object-cover border border-slate-200/90 dark:border-white/10 shadow-sm"
+                />
+              </div>
+              <h1 className="mt-4 text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                Finora Admin Hub
+              </h1>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Boshqaruv va audit tizimiga xavfsiz avtorizatsiya
+              </p>
+            </div>
+
+            {/* Segmented Tab Switcher */}
+            <div className="mt-6 flex rounded-2xl border border-slate-200/90 bg-slate-100/80 p-1 dark:border-white/5 dark:bg-slate-900/60">
+              <button
+                type="button"
+                onClick={() => setAuthMode('qr')}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all ${
+                  authMode === 'qr'
+                    ? 'bg-white text-slate-950 shadow-xs dark:bg-dark-cardSecondary dark:text-white'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <Smartphone className="h-3.5 w-3.5 text-finora-600 dark:text-finora-400" />
+                <span>QR Kod</span>
+                <span className="rounded-full bg-finora-500/20 px-1.5 py-0.2 text-[9.5px] font-black text-finora-800 dark:text-finora-300">
+                  Tezkor
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAuthMode('password')}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all ${
+                  authMode === 'password'
+                    ? 'bg-white text-slate-950 shadow-xs dark:bg-dark-cardSecondary dark:text-white'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                <KeyRound className="h-3.5 w-3.5" />
+                <span>Parol orqali</span>
+              </button>
+            </div>
+
+            {/* TAB 1: QR CODE AUTH */}
+            {authMode === 'qr' && (
+              <div className="mt-6 flex flex-col items-center animate-in fade-in duration-200">
+                {/* Styled Finora QR Code */}
+                <FinoraQRCode
+                  token={qrToken}
+                  isLoading={qrLoading}
+                  isExpired={isQrExpired}
+                  isSuccess={isQrSuccess}
+                  error={qrError}
+                  timeLeft={timeLeft}
+                  totalTime={60}
+                  onRefresh={generateQr}
+                  size={195}
+                />
+
+                {/* Minimalist 3-Step Scan Guide */}
+                <div className="mt-5 w-full rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5 text-[11.5px] text-slate-600 dark:border-white/5 dark:bg-slate-900/40 dark:text-slate-300 space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-finora-500/20 text-[10px] font-black text-finora-800 dark:text-finora-300">
+                      1
+                    </span>
+                    <span>Finora mobil ilovasini oching</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-finora-500/20 text-[10px] font-black text-finora-800 dark:text-finora-300">
+                      2
+                    </span>
+                    <span className="truncate">
+                      <strong>Profil</strong> &rarr; <strong>Admin panelga kirish</strong>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-finora-500/20 text-[10px] font-black text-finora-800 dark:text-finora-300">
+                      3
+                    </span>
+                    <span>Kodni skanerlab, <strong>Face ID</strong> bilan tasdiqlang</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: PASSWORD AUTH */}
+            {authMode === 'password' && (
+              <div className="mt-6 animate-in fade-in duration-200">
+                {/* Cooldown Alert */}
+                {cooldownSeconds > 0 ? (
+                  <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200">
+                    <ShieldCheck className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                    <div>
+                      <p className="font-bold">Xavfsizlik blokirovkasi faol</p>
+                      <p className="text-[11px] opacity-90 mt-0.5">
+                        Xavfsizlik uchun tizim vaqtincha to'xtatildi. Qayta urinish: <strong>{cooldownSeconds} soniya</strong>
+                      </p>
+                    </div>
+                  </div>
+                ) : passwordError ? (
+                  <div className="mb-4 flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50/80 p-3 text-xs text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+                    <span className="font-medium leading-tight">{passwordError}</span>
+                  </div>
+                ) : null}
+
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                      Email manzil
+                    </label>
+                    <div className="relative mt-1.5">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <Mail className="h-4 w-4" />
+                      </div>
+                      <input
+                        type="email"
+                        value={email}
+                        disabled={cooldownSeconds > 0}
+                        onChange={e => setEmail(e.target.value)}
+                        placeholder="admin@finora.uz"
+                        required
+                        autoFocus
+                        className="w-full rounded-xl border border-slate-300/90 bg-slate-50/50 py-2.5 pl-10 pr-3.5 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/15 dark:border-white/10 dark:bg-slate-900/60 dark:text-white disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                      Parol
+                    </label>
+                    <div className="relative mt-1.5">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <Lock className="h-4 w-4" />
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        disabled={cooldownSeconds > 0}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                        className="w-full rounded-xl border border-slate-300/90 bg-slate-50/50 py-2.5 pl-10 pr-10 text-xs text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-finora-500 focus:bg-white focus:ring-4 focus:ring-finora-500/15 dark:border-white/10 dark:bg-slate-900/60 dark:text-white disabled:opacity-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        disabled={cooldownSeconds > 0}
+                        onChange={e => setRememberMe(e.target.checked)}
+                        className="h-4 w-4 rounded border-slate-300 text-finora-600 focus:ring-finora-500/20 dark:border-white/10 dark:bg-slate-800"
+                      />
+                      <span className="text-xs text-slate-600 dark:text-slate-400">
+                        Eslab qolish
+                      </span>
+                    </label>
+                    <span className="text-[11px] font-semibold text-finora-600 dark:text-finora-400">
+                      Faqat ma'murlar uchun
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={passwordLoading || cooldownSeconds > 0}
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-finora-500 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-finora-500/25 transition-all hover:bg-finora-400 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {passwordLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
+                        <span>Tekshirilmoqda...</span>
+                      </div>
+                    ) : cooldownSeconds > 0 ? (
+                      <span>Bloklandi ({cooldownSeconds}s)</span>
+                    ) : (
+                      <>
+                        <span>Tizimga kirish</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 py-5 text-center text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/40 dark:border-white/5">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4">
+          <span>Finora Financial OS &copy; 2026</span>
+          <span className="hidden sm:inline opacity-40">•</span>
+          <span className="flex items-center gap-1 text-[11px]">
+            <ShieldCheck className="h-3.5 w-3.5 text-finora-500" />
+            2FA Biometrik &amp; End-to-End Shifrlangan
+          </span>
+        </div>
+      </footer>
     </div>
   )
 }
