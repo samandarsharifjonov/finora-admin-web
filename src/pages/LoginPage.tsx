@@ -18,8 +18,6 @@ import { useTheme } from '../context/ThemeContext'
 import { apiRequest } from '../lib/api'
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '../lib/security'
 import { FinoraQRCode } from '../components/common/FinoraQRCode'
-import { InteractiveDotsBackground } from '../components/common/InteractiveDotsBackground'
-import { TiltCard } from '../components/common/TiltCard'
 import type { User } from '../types'
 
 interface QRGenerateResponse {
@@ -220,8 +218,8 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-dark-bg dark:text-slate-100 transition-colors duration-300">
-      {/* Interactive Physics Dot-Matrix Background */}
-      <InteractiveDotsBackground />
+      {/* Calm, Static Subtle Dot-Matrix Background */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-dot-pattern-light dark:bg-dot-pattern-dark opacity-50" />
 
       {/* Top Navbar */}
       <header className="relative z-10 flex h-16 w-full items-center justify-between px-5 sm:px-8 border-b border-slate-200/60 dark:border-white/5 backdrop-blur-md">
@@ -254,9 +252,9 @@ export const LoginPage: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex flex-1 items-center justify-center p-4 sm:p-6 my-auto">
-        <TiltCard className="w-full max-w-[420px]">
-          {/* Minimalist Glass Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 sm:p-8 backdrop-blur-xl dark:border-white/10 dark:bg-dark-card/90 transition-all">
+        <div className="w-full max-w-[420px]">
+          {/* Minimalist Card */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 sm:p-8 shadow-2xl shadow-slate-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-dark-card/90 dark:shadow-black/50 transition-all">
             {/* Header: in QR mode, no big logo above */}
             <div className="text-center">
               {authMode === 'password' && (
@@ -458,7 +456,7 @@ export const LoginPage: React.FC = () => {
               </div>
             )}
           </div>
-        </TiltCard>
+        </div>
       </main>
 
       {/* Footer without extra text */}
