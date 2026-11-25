@@ -17,6 +17,7 @@ import {
 import { fetchAuditAdmins, fetchAuditLogs } from '../lib/auditLogApi'
 import type { AdminAuditLog, AuditAdminSummary } from '../types/auditLog'
 import { formatDate } from '../lib/utils'
+import { getPermissionInfo } from '../lib/permissions'
 import { DateRangePicker } from '../components/common/DateRangePicker'
 import { UserAvatar } from '../components/common/UserAvatar'
 import { Skeleton } from '../components/common/Skeleton'
@@ -169,6 +170,75 @@ function getActionMeta(action: string): ActionMeta {
 function formatTargetNode(targetType: string, targetId?: number | null): string {
   const base = TARGET_LABELS[targetType] || targetType || 'Tizim'
   return targetId ? `${base} #${targetId}` : base
+}
+
+const DETAIL_KEY_LABELS: Record<string, string> = {
+  reason: 'Sabab',
+  send_now: 'Yuborish usuli',
+  has_schedule: 'Rejalashtirilgan',
+  delete_in_app: 'Ilovadan ham o‘chirish',
+  deleted_count: 'O‘chirilganlar soni',
+  status: 'Holati',
+  latest_version: 'Yangi versiya',
+  min_version: 'Minimal versiya',
+  is_force_update: 'Majburiy yangilanish',
+  is_optional_update: 'Ixtiyoriy yangilanish',
+  permissions: 'Berilgan ruxsatlar',
+  user_ids: 'Foydalanuvchi IDlari',
+  candidate_user_id: 'Nomzod IDsi',
+  file_name: 'Fayl nomi',
+  title: 'Sarlavha',
+}
+
+const STATUS_VALUE_LABELS: Record<string, string> = {
+  pending: 'Kutilmoqda',
+  sent: 'Yuborilgan',
+  cancelled: 'Bekor qilingan',
+  all: 'Barchasi',
+}
+
+interface FormattedDetailItem {
+  key: string
+  label: string
+  value: string
+}
+
+function formatAuditDetails(details?: Record<string, unknown>): FormattedDetailItem[] {
+  if (!details) return []
+  const result: FormattedDetailItem[] = []
+
+  for (const [key, rawVal] of Object.entries(details)) {
+    if (rawVal === null || rawVal === undefined) continue
+    if (typeof rawVal === 'string' && rawVal.trim() === '') continue
+    if (Array.isArray(rawVal) && rawVal.length === 0) continue
+
+    const label = DETAIL_KEY_LABELS[key] || key
+    let value = ''
+
+    if (key === 'send_now' && typeof rawVal === 'boolean') {
+      value = rawVal ? 'Darhol yuborilgan' : 'Rejalashtirilgan'
+    } else if (typeof rawVal === 'boolean') {
+      value = rawVal ? 'Ha' : 'Yo‘q'
+    } else if (key === 'deleted_count' && typeof rawVal === 'number') {
+      value = `${rawVal} ta`
+    } else if (key === 'status' && typeof rawVal === 'string') {
+      value = STATUS_VALUE_LABELS[rawVal] || rawVal
+    } else if (key === 'permissions' && Array.isArray(rawVal)) {
+      value = rawVal.map(code => getPermissionInfo(String(code)).shortLabel).join(', ')
+    } else if (key === 'user_ids' && Array.isArray(rawVal)) {
+      value = rawVal.map(id => `#${id}`).join(', ')
+    } else if (key === 'candidate_user_id') {
+      value = `#${rawVal}`
+    } else if (typeof rawVal === 'object') {
+      value = JSON.stringify(rawVal)
+    } else {
+      value = String(rawVal)
+    }
+
+    result.push({ key, label, value })
+  }
+
+  return result
 }
 
 export const AuditLogsPage: React.FC = () => {
@@ -390,7 +460,8 @@ export const AuditLogsPage: React.FC = () => {
                 {logs.map(item => {
                   const meta = getActionMeta(item.action)
                   const targetNode = formatTargetNode(item.target_type, item.target_id)
-                  const hasDetails = Boolean(item.details && Object.keys(item.details).length > 0)
+                  const formattedDetails = formatAuditDetails(item.details)
+                  const hasDetails = formattedDetails.length > 0
                   const isExpanded = expandedId === item.id
 
                   return (
@@ -463,14 +534,17 @@ export const AuditLogsPage: React.FC = () => {
 
                         {/* Expandable Details */}
                         {hasDetails && isExpanded && (
-                          <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-slate-200/70 pt-2.5 text-[11px] dark:border-dark-border/60">
-                            {Object.entries(item.details || {}).map(([k, v]) => (
-                              <div key={k} className="flex items-center gap-1.5">
+                          <div className="mt-2.5 flex flex-wrap gap-2 border-t border-slate-200/70 pt-2.5 text-[11px] dark:border-dark-border/60">
+                            {formattedDetails.map(d => (
+                              <div
+                                key={d.key}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-white px-2.5 py-1 dark:border-dark-border dark:bg-dark-card"
+                              >
                                 <span className="font-semibold text-slate-500 dark:text-slate-400">
-                                  {k}:
+                                  {d.label}:
                                 </span>
-                                <span className="font-mono text-slate-800 dark:text-slate-200">
-                                  {typeof v === 'object' ? JSON.stringify(v) : String(v)}
+                                <span className="font-bold text-slate-800 dark:text-slate-200">
+                                  {d.value}
                                 </span>
                               </div>
                             ))}
