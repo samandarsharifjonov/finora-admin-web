@@ -3,7 +3,6 @@ import {
   Search,
   RefreshCw,
   MessageSquare,
-  Radio,
   Megaphone,
   Loader2,
 } from 'lucide-react'
@@ -44,7 +43,6 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
   onSearchChange,
   tab,
   onTabChange,
-  socketStatus,
   refreshing,
   onRefresh,
   onSelectChat,
@@ -83,21 +81,6 @@ export const SupportChatList: React.FC<SupportChatListProps> = ({
               <Megaphone className="h-3 w-3" />
               <span className="hidden sm:inline">Umumiy xabar</span>
             </button>
-
-            {/* Live Socket badge */}
-            <span
-              title={socketStatus === 'connected' ? 'Real-time WebSocket ulangan' : 'Sinxron rejim'}
-              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                socketStatus === 'connected'
-                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                  : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
-              }`}
-            >
-              <Radio className={`h-3 w-3 ${socketStatus === 'connected' ? 'animate-pulse text-emerald-600' : ''}`} />
-              <span className="hidden lg:inline">
-                {socketStatus === 'connected' ? 'Jonli' : 'Sinxron'}
-              </span>
-            </span>
 
             {/* Refresh */}
             <button

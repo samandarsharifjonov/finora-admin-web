@@ -59,9 +59,25 @@ export const SupportChatView: React.FC<SupportChatViewProps> = ({
   }
 
   // Format date separators
+  const UZ_MONTHS = [
+    'yanvar',
+    'fevral',
+    'mart',
+    'aprel',
+    'may',
+    'iyun',
+    'iyul',
+    'avgust',
+    'sentabr',
+    'oktabr',
+    'noyabr',
+    'dekabr',
+  ]
+
   const formatGroupDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr)
+      if (isNaN(d.getTime())) return ''
       const today = new Date()
       const yesterday = new Date()
       yesterday.setDate(today.getDate() - 1)
@@ -69,11 +85,8 @@ export const SupportChatView: React.FC<SupportChatViewProps> = ({
       if (d.toDateString() === today.toDateString()) return 'Bugun'
       if (d.toDateString() === yesterday.toDateString()) return 'Kecha'
 
-      return d.toLocaleDateString('uz-UZ', {
-        day: 'numeric',
-        month: 'long',
-        year: d.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
-      })
+      const dayMonth = `${d.getDate()}-${UZ_MONTHS[d.getMonth()]}`
+      return d.getFullYear() !== today.getFullYear() ? `${dayMonth}, ${d.getFullYear()}` : dayMonth
     } catch {
       return ''
     }
@@ -88,7 +101,7 @@ export const SupportChatView: React.FC<SupportChatViewProps> = ({
       lastDate = msgDate
       renderedMessagesWithDates.push(
         <div key={`date-${msg.created_at}-${msg.id}`} className="flex justify-center my-3">
-          <span className="rounded-full bg-slate-200/80 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300 shadow-2xs select-none">
+          <span className="rounded-full border border-slate-200/70 bg-white/85 px-3 py-0.5 text-[10.5px] font-bold text-slate-600 backdrop-blur-xs select-none dark:border-dark-border/80 dark:bg-dark-card/85 dark:text-slate-300">
             {msgDate}
           </span>
         </div>
