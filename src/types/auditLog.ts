@@ -19,3 +19,14 @@ export interface AdminAuditLogListResponse {
   limit: number
   offset: number
 }
+
+export interface AuditAdminSummary {
+  user_id: number
+  email: string
+  full_name: string
+  avatar_url: string
+  total_actions: number
+  last_action_at?: string | null
+  last_action?: string
+  last_summary?: string
+}
