@@ -242,8 +242,7 @@ export const AuditLogsPage: React.FC = () => {
     return admins.filter(
       a =>
         a.full_name.toLowerCase().includes(q) ||
-        a.email.toLowerCase().includes(q) ||
-        (a.last_summary || '').toLowerCase().includes(q)
+        a.email.toLowerCase().includes(q)
     )
   }, [admins, adminSearch])
 
@@ -384,8 +383,8 @@ export const AuditLogsPage: React.FC = () => {
             </div>
           ) : (
             <div className="relative pl-6">
-              {/* Vertical timeline spine */}
-              <div className="absolute bottom-3 left-[7px] top-3 w-px bg-slate-200 dark:bg-dark-border" />
+              {/* Vertical dashed timeline spine */}
+              <div className="absolute bottom-4 left-[6px] top-4 border-l-2 border-dashed border-slate-200 dark:border-dark-border" />
 
               <div className="space-y-3.5">
                 {logs.map(item => {
@@ -402,29 +401,29 @@ export const AuditLogsPage: React.FC = () => {
                       />
 
                       <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 transition-colors hover:border-slate-300/90 hover:bg-slate-50 dark:border-dark-border/80 dark:bg-dark-cardSecondary/35 dark:hover:bg-dark-cardSecondary/60">
-                        {/* Arrow Flow Diagram: [Admin] ──▶ [Amal] ──▶ [Nishon] */}
+                        {/* Dashed Arrow Flow Diagram: [Admin] ┄┄▶ [Amal] ┄┄▶ [Nishon] */}
                         <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                          <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-800 dark:border-dark-border dark:bg-dark-card dark:text-slate-200">
+                          <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-800 shadow-2xs dark:border-dark-border dark:bg-dark-card dark:text-slate-200">
                             {selectedAdmin.full_name || selectedAdmin.email.split('@')[0]}
                           </span>
 
-                          <span className="inline-flex items-center text-slate-400" aria-hidden="true">
-                            <span className="h-px w-2.5 bg-slate-300 dark:bg-slate-600" />
-                            <ArrowRight className="h-3.5 w-3.5 -ml-0.5" />
+                          <span className="inline-flex items-center text-finora-600 dark:text-finora-400" aria-hidden="true">
+                            <span className="w-5 border-t-2 border-dashed border-finora-500/60 dark:border-finora-400/50" />
+                            <ArrowRight className="h-3.5 w-3.5 -ml-1" />
                           </span>
 
                           <span
-                            className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[11px] font-bold ${meta.badgeClass}`}
+                            className={`inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[11px] font-bold ${meta.badgeClass}`}
                           >
                             {meta.label}
                           </span>
 
-                          <span className="inline-flex items-center text-slate-400" aria-hidden="true">
-                            <span className="h-px w-2.5 bg-slate-300 dark:bg-slate-600" />
-                            <ArrowRight className="h-3.5 w-3.5 -ml-0.5" />
+                          <span className="inline-flex items-center text-slate-400 dark:text-slate-500" aria-hidden="true">
+                            <span className="w-5 border-t-2 border-dashed border-slate-300 dark:border-slate-600" />
+                            <ArrowRight className="h-3.5 w-3.5 -ml-1" />
                           </span>
 
-                          <span className="inline-flex items-center rounded-lg border border-slate-200/80 bg-white/80 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-dark-border dark:bg-dark-card/80 dark:text-slate-300">
+                          <span className="inline-flex items-center rounded-lg border border-slate-200/80 bg-white/90 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 shadow-2xs dark:border-dark-border dark:bg-dark-card/90 dark:text-slate-300">
                             {targetNode}
                           </span>
                         </div>
@@ -536,7 +535,7 @@ export const AuditLogsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-              Audit Log
+              Adminlar harakati
             </h1>
             <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400">
               <ShieldCheck className="h-3 w-3" />
@@ -619,62 +618,46 @@ export const AuditLogsPage: React.FC = () => {
           </div>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-dark-border/60">
-            {filteredAdmins.map(admin => {
-              const lastMeta = admin.last_action ? getActionMeta(admin.last_action) : null
-              return (
-                <button
-                  key={admin.user_id}
-                  type="button"
-                  onClick={() => handleSelectAdmin(admin)}
-                  className="group flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left transition-colors hover:bg-slate-50/80 dark:hover:bg-dark-cardSecondary/60 sm:px-5"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <UserAvatar
-                      src={admin.avatar_url}
-                      name={admin.full_name}
-                      email={admin.email}
-                      size="md"
-                    />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate text-xs font-bold text-slate-900 dark:text-white sm:text-sm">
-                          {admin.full_name || 'Admin'}
-                        </span>
-                        <span className="rounded-md border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9.5px] font-bold text-slate-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300">
-                          ADMIN
-                        </span>
-                      </div>
-                      <p className="truncate text-[11px] text-slate-400">{admin.email}</p>
-                      {admin.last_summary && (
-                        <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                          {lastMeta && (
-                            <span
-                              className={`inline-flex shrink-0 rounded border px-1.5 py-0.2 text-[9.5px] font-bold ${lastMeta.badgeClass}`}
-                            >
-                              {lastMeta.label}
-                            </span>
-                          )}
-                          <ArrowRight className="h-3 w-3 shrink-0 text-slate-400" />
-                          <span className="truncate">{admin.last_summary}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-3">
-                    <div className="text-right">
-                      <span className="inline-flex items-center rounded-lg border border-finora-500/25 bg-finora-500/10 px-2.5 py-1 text-[11px] font-extrabold tabular-nums text-finora-800 dark:text-finora-300">
-                        {admin.total_actions} ta amal
+            {filteredAdmins.map(admin => (
+              <button
+                key={admin.user_id}
+                type="button"
+                onClick={() => handleSelectAdmin(admin)}
+                className="group flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left transition-colors hover:bg-slate-50/80 dark:hover:bg-dark-cardSecondary/60 sm:px-5"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <UserAvatar
+                    src={admin.avatar_url}
+                    name={admin.full_name}
+                    email={admin.email}
+                    size="md"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-xs font-bold text-slate-900 dark:text-white sm:text-sm">
+                        {admin.full_name || 'Admin'}
                       </span>
-                      <p className="mt-1 text-[10.5px] tabular-nums text-slate-400">
-                        {admin.last_action_at ? formatDate(admin.last_action_at) : "Hali amal yo'q"}
-                      </p>
+                      <span className="rounded-md border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[9.5px] font-bold text-slate-600 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-slate-300">
+                        ADMIN
+                      </span>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-finora-600 dark:group-hover:text-finora-400" />
+                    <p className="truncate text-[11px] text-slate-400">{admin.email}</p>
                   </div>
-                </button>
-              )
-            })}
+                </div>
+
+                <div className="flex shrink-0 items-center gap-3">
+                  <div className="text-right">
+                    <span className="inline-flex items-center rounded-lg border border-finora-500/25 bg-finora-500/10 px-2.5 py-1 text-[11px] font-extrabold tabular-nums text-finora-800 dark:text-finora-300">
+                      {admin.total_actions} ta amal
+                    </span>
+                    <p className="mt-1 text-[10.5px] tabular-nums text-slate-400">
+                      {admin.last_action_at ? formatDate(admin.last_action_at) : "Hali amal yo'q"}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-finora-600 dark:group-hover:text-finora-400" />
+                </div>
+              </button>
+            ))}
           </div>
         )}
       </div>

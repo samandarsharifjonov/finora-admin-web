@@ -60,7 +60,7 @@ function getRouteMeta(pathname: string): RouteMeta {
     return { title: 'Adminlar va rollar', subtitle: 'Ruxsatlar va kirish nazorati' }
   }
   if (pathname.startsWith('/audit-logs')) {
-    return { title: 'Audit Log', subtitle: 'Admin harakatlari tarixi (Super Admin)' }
+    return { title: 'Adminlar harakati', subtitle: 'Adminlar bajargan amallar oqimi (Super Admin)' }
   }
   if (pathname.startsWith('/terms')) {
     return { title: 'Foydalanish shartlari', subtitle: 'Huquqiy hujjatlar tahriri' }
@@ -109,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
         ? [
             { to: '/protected-users', label: 'Himoyalangan hisoblar', desc: 'VIP / himoyalangan profillar', icon: ShieldAlert },
             { to: '/admins', label: 'Adminlar va rollar', desc: 'Jamoa ruxsatlari', icon: ShieldCheck },
-            { to: '/audit-logs', label: 'Audit log', desc: 'Admin harakatlari jurnali', icon: ScrollText },
+            { to: '/audit-logs', label: 'Adminlar harakati', desc: 'Adminlar harakatlari oqimi', icon: ScrollText },
           ]
         : []),
       ...(hasPermission('terms.manage')

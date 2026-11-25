@@ -128,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               },
               {
                 to: '/audit-logs',
-                label: 'Audit log',
+                label: 'Adminlar harakati',
                 icon: ScrollText,
               },
             ]
