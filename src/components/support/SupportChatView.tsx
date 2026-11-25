@@ -126,7 +126,7 @@ export const SupportChatView: React.FC<SupportChatViewProps> = ({
       </div>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-1">
+      <div className="bg-chat-wallpaper flex-1 overflow-y-auto p-3 sm:p-5 space-y-1">
         {loading ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-500">
             <div className="h-7 w-7 animate-spin rounded-full border-2 border-finora-500 border-t-transparent" />
