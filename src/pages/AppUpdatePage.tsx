@@ -484,17 +484,20 @@ export const AppUpdatePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Phone Frame */}
-            <div className="relative mx-auto max-w-[340px] overflow-hidden rounded-[36px] border-[6px] border-slate-800 bg-slate-950 p-2 shadow-2xl ring-1 ring-slate-700">
-              {/* Dynamic Island / Speaker notch */}
-              <div className="mx-auto mb-2 h-4 w-24 rounded-full bg-slate-800" />
+            {/* Realistic iPhone PNG Mockup Frame */}
+            <div className="relative mx-auto w-full max-w-[300px] select-none">
+              <img
+                src={`${import.meta.env.BASE_URL}iphone-mockup.png`}
+                alt="iPhone Mockup"
+                className="pointer-events-none block h-auto w-full drop-shadow-xl"
+              />
 
-              {/* Screen Mockup Area */}
-              <div className="relative flex min-h-[460px] flex-col justify-end overflow-hidden rounded-[26px] bg-slate-900 p-3">
+              {/* Live Screen Overlay positioned inside iPhone screen */}
+              <div className="absolute inset-x-[5.5%] top-[6.2%] bottom-[4.2%] flex flex-col justify-end overflow-hidden rounded-[28px] p-3">
                 {/* Background Fake Dashboard */}
-                <div className="absolute inset-0 p-4 opacity-15 filter blur-[1px]">
-                  <div className="h-6 w-28 rounded bg-slate-600 mb-3" />
-                  <div className="h-24 w-full rounded-2xl bg-slate-700 mb-3" />
+                <div className="pointer-events-none absolute inset-0 p-4 pt-6 opacity-15 filter blur-[1px]">
+                  <div className="mb-3 h-5 w-24 rounded bg-slate-600" />
+                  <div className="mb-3 h-24 w-full rounded-2xl bg-slate-700" />
                   <div className="grid grid-cols-2 gap-2">
                     <div className="h-16 rounded-xl bg-slate-700" />
                     <div className="h-16 rounded-xl bg-slate-700" />
@@ -502,44 +505,47 @@ export const AppUpdatePage: React.FC = () => {
                 </div>
 
                 {/* Dark overlay backdrop for modal */}
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+                <div className="pointer-events-none absolute inset-0 bg-black/50 backdrop-blur-[1.5px]" />
 
                 {/* Bottom Sheet Card */}
-                <div className="relative z-10 rounded-2xl border border-slate-700/60 bg-slate-850 bg-slate-800/95 p-4 text-center shadow-2xl backdrop-blur-md">
+                <div className="relative z-10 rounded-2xl border border-slate-700/60 bg-slate-800/95 p-3.5 text-center shadow-2xl backdrop-blur-md">
                   {/* Pull notch */}
-                  <div className="mx-auto mb-3 h-1 w-8 rounded-full bg-slate-600" />
+                  <div className="mx-auto mb-2.5 h-1 w-8 rounded-full bg-slate-600" />
 
                   {/* Header Icon */}
-                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-finora-600 to-finora-400 text-white shadow-lg shadow-finora-500/20">
-                    <Download className="h-6 w-6" />
+                  <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-finora-600 to-finora-400 text-white shadow-lg shadow-finora-500/20">
+                    <Download className="h-5 w-5" />
                   </div>
 
-                  <h3 className="text-sm font-bold text-white mb-2">
+                  <h3 className="mb-1.5 text-xs font-bold text-white">
                     {title || 'Yangi versiya mavjud!'}
                   </h3>
 
                   {/* Release Notes */}
                   {releaseNotes ? (
-                    <div className="my-2 max-h-24 overflow-y-auto rounded-xl bg-slate-900/60 p-2.5 text-left text-[11px] text-slate-300 border border-slate-700/50">
-                      <div className="font-semibold text-slate-200 mb-0.5">O'zgarishlar:</div>
+                    <div className="my-2 max-h-24 overflow-y-auto rounded-xl border border-slate-700/50 bg-slate-900/60 p-2 text-left text-[10.5px] text-slate-300">
+                      <div className="mb-0.5 font-semibold text-slate-200">O'zgarishlar:</div>
                       <p className="whitespace-pre-line leading-relaxed">{releaseNotes}</p>
                     </div>
                   ) : (
-                    <p className="my-2 text-[11px] text-slate-400">
+                    <p className="my-1.5 text-[10.5px] leading-relaxed text-slate-400">
                       Ilovani eng so‘nggi imkoniyatlardan foydalanish uchun yangilang.
                     </p>
                   )}
 
                   {/* Platform Indicator */}
-                  <div className="my-2 text-[10px] text-slate-400">
-                    Do'kon: <span className="font-semibold text-white">{previewPlatform === 'ios' ? 'Apple App Store' : 'Google Play Store'}</span>
+                  <div className="my-1.5 text-[10px] text-slate-400">
+                    Do'kon:{' '}
+                    <span className="font-semibold text-white">
+                      {previewPlatform === 'ios' ? 'Apple App Store' : 'Google Play Store'}
+                    </span>
                   </div>
 
                   {/* Action Buttons */}
                   <div className="space-y-1.5 pt-1">
                     <button
                       type="button"
-                      className="w-full rounded-xl bg-finora-500 py-2.5 text-xs font-bold text-slate-950 shadow-md transition-all hover:bg-finora-400"
+                      className="w-full rounded-xl bg-finora-500 py-2 text-xs font-bold text-slate-950 shadow-md transition-all hover:bg-finora-400"
                     >
                       Yangilash
                     </button>
@@ -547,23 +553,20 @@ export const AppUpdatePage: React.FC = () => {
                     {isOptionalUpdate && (
                       <button
                         type="button"
-                        className="w-full rounded-xl border border-slate-700 bg-transparent py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                        className="w-full rounded-xl border border-slate-700 bg-transparent py-1.5 text-[11px] font-semibold text-slate-400 hover:text-white"
                       >
                         Keyinroq
                       </button>
                     )}
 
                     {isForceUpdate && (
-                      <div className="pt-1 text-[10px] font-medium text-rose-400">
+                      <div className="pt-0.5 text-[9.5px] font-medium text-rose-400">
                         * Majburiy rejim: oynani yopib bo'lmaydi
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* Bottom Home indicator */}
-              <div className="mx-auto mt-2 h-1 w-28 rounded-full bg-slate-700" />
             </div>
           </div>
         </div>
