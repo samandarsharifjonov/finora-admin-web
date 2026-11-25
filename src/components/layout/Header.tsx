@@ -51,7 +51,7 @@ function getRouteMeta(pathname: string): RouteMeta {
     return { title: 'Tizim analitikasi', subtitle: 'Toifalar, qurilmalar va o‘chirishlar' }
   }
   if (pathname.startsWith('/notifications')) {
-    return { title: 'Xabarnomalar', subtitle: 'Push va ommaviy xabar yuborish' }
+    return { title: 'Xabarnomalar va yangiliklar', subtitle: 'Push va ommaviy xabar yuborish' }
   }
   if (pathname.startsWith('/protected-users')) {
     return { title: 'Himoyalangan hisoblar', subtitle: 'Maxsus himoya ostidagi profillar' }
