@@ -32,9 +32,6 @@ export const AppUpdatePage: React.FC = () => {
   const [playStoreUrl, setPlayStoreUrl] = useState('https://play.google.com/store/apps/details?id=uz.finora.app')
   const [appStoreUrl, setAppStoreUrl] = useState('https://apps.apple.com/app/finora/id000000000')
 
-  // Preview device platform toggle
-  const [previewPlatform, setPreviewPlatform] = useState<'android' | 'ios'>('android')
-
   const fetchConfig = async () => {
     setLoading(true)
     setError(null)
@@ -233,14 +230,12 @@ export const AppUpdatePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Grid: Form (Left) & Mobile Mockup (Right) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Left Column: Form */}
-        <div className="lg:col-span-7">
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card"
-          >
+      {/* Main Form */}
+      <div className="max-w-3xl">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-card"
+        >
             <div className="border-b border-slate-100 pb-4 dark:border-dark-border">
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Yangilanish parametrlari
@@ -447,129 +442,6 @@ export const AppUpdatePage: React.FC = () => {
               </button>
             </div>
           </form>
-        </div>
-
-        {/* Right Column: Live Mobile Mockup Preview */}
-        <div className="lg:col-span-5">
-          <div className="sticky top-6 space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Ilovada ko'rinishi (Jonli Preview)
-              </span>
-
-              {/* Platform Switcher */}
-              <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 dark:border-dark-border dark:bg-dark-cardSecondary">
-                <button
-                  type="button"
-                  onClick={() => setPreviewPlatform('android')}
-                  className={`rounded-md px-2.5 py-1 text-[11px] font-bold transition-colors ${
-                    previewPlatform === 'android'
-                      ? 'bg-white text-slate-900 shadow-sm dark:bg-dark-card dark:text-white'
-                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400'
-                  }`}
-                >
-                  Android
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewPlatform('ios')}
-                  className={`rounded-md px-2.5 py-1 text-[11px] font-bold transition-colors ${
-                    previewPlatform === 'ios'
-                      ? 'bg-white text-slate-900 shadow-sm dark:bg-dark-card dark:text-white'
-                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400'
-                  }`}
-                >
-                  iOS (Apple)
-                </button>
-              </div>
-            </div>
-
-            {/* Realistic iPhone PNG Mockup Frame */}
-            <div className="relative mx-auto w-full max-w-[300px] select-none">
-              <img
-                src={`${import.meta.env.BASE_URL}iphone-mockup.png`}
-                alt="iPhone Mockup"
-                className="pointer-events-none block h-auto w-full drop-shadow-xl"
-              />
-
-              {/* Live Screen Overlay positioned inside iPhone screen */}
-              <div className="absolute inset-x-[5.5%] top-[6.2%] bottom-[4.2%] flex flex-col justify-end overflow-hidden rounded-[28px] p-3">
-                {/* Background Fake Dashboard */}
-                <div className="pointer-events-none absolute inset-0 p-4 pt-6 opacity-15 filter blur-[1px]">
-                  <div className="mb-3 h-5 w-24 rounded bg-slate-600" />
-                  <div className="mb-3 h-24 w-full rounded-2xl bg-slate-700" />
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="h-16 rounded-xl bg-slate-700" />
-                    <div className="h-16 rounded-xl bg-slate-700" />
-                  </div>
-                </div>
-
-                {/* Dark overlay backdrop for modal */}
-                <div className="pointer-events-none absolute inset-0 bg-black/50 backdrop-blur-[1.5px]" />
-
-                {/* Bottom Sheet Card */}
-                <div className="relative z-10 rounded-2xl border border-slate-700/60 bg-slate-800/95 p-3.5 text-center shadow-2xl backdrop-blur-md">
-                  {/* Pull notch */}
-                  <div className="mx-auto mb-2.5 h-1 w-8 rounded-full bg-slate-600" />
-
-                  {/* Header Icon */}
-                  <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-finora-600 to-finora-400 text-white shadow-lg shadow-finora-500/20">
-                    <Download className="h-5 w-5" />
-                  </div>
-
-                  <h3 className="mb-1.5 text-xs font-bold text-white">
-                    {title || 'Yangi versiya mavjud!'}
-                  </h3>
-
-                  {/* Release Notes */}
-                  {releaseNotes ? (
-                    <div className="my-2 max-h-24 overflow-y-auto rounded-xl border border-slate-700/50 bg-slate-900/60 p-2 text-left text-[10.5px] text-slate-300">
-                      <div className="mb-0.5 font-semibold text-slate-200">O'zgarishlar:</div>
-                      <p className="whitespace-pre-line leading-relaxed">{releaseNotes}</p>
-                    </div>
-                  ) : (
-                    <p className="my-1.5 text-[10.5px] leading-relaxed text-slate-400">
-                      Ilovani eng so‘nggi imkoniyatlardan foydalanish uchun yangilang.
-                    </p>
-                  )}
-
-                  {/* Platform Indicator */}
-                  <div className="my-1.5 text-[10px] text-slate-400">
-                    Do'kon:{' '}
-                    <span className="font-semibold text-white">
-                      {previewPlatform === 'ios' ? 'Apple App Store' : 'Google Play Store'}
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="space-y-1.5 pt-1">
-                    <button
-                      type="button"
-                      className="w-full rounded-xl bg-finora-500 py-2 text-xs font-bold text-slate-950 shadow-md transition-all hover:bg-finora-400"
-                    >
-                      Yangilash
-                    </button>
-
-                    {isOptionalUpdate && (
-                      <button
-                        type="button"
-                        className="w-full rounded-xl border border-slate-700 bg-transparent py-1.5 text-[11px] font-semibold text-slate-400 hover:text-white"
-                      >
-                        Keyinroq
-                      </button>
-                    )}
-
-                    {isForceUpdate && (
-                      <div className="pt-0.5 text-[9.5px] font-medium text-rose-400">
-                        * Majburiy rejim: oynani yopib bo'lmaydi
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )
