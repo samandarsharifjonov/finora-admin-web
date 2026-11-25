@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { ToastProvider } from './context/ToastContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { PermissionGuard } from './components/PermissionGuard'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
@@ -18,6 +19,7 @@ import { SupportPage } from './pages/SupportPage'
 import { ProtectedUsersPage } from './pages/ProtectedUsersPage'
 import { ReceiptsPage } from './pages/ReceiptsPage'
 import { AppUpdatePage } from './pages/AppUpdatePage'
+import { AuditLogsPage } from './pages/AuditLogsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 // Normalize router basename so trailing slash does not break route matching on GitHub Pages
@@ -78,8 +80,9 @@ export function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <BrowserRouter basename={basename}>
+        <ToastProvider>
+          <AuthProvider>
+            <BrowserRouter basename={basename}>
             <Routes>
               {/* Public Auth Route */}
               <Route path="/login" element={<LoginPage />} />
@@ -149,6 +152,14 @@ export function App() {
                 }
               />
               <Route
+                path="audit-logs"
+                element={
+                  <PermissionGuard superAdminOnly>
+                    <AuditLogsPage />
+                  </PermissionGuard>
+                }
+              />
+              <Route
                 path="receipts"
                 element={
                   <PermissionGuard permission={['overview.view', 'users.view']}>
@@ -194,6 +205,7 @@ export function App() {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   </ErrorBoundary>
 )

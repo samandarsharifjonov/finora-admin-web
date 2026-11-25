@@ -11,7 +11,6 @@ import {
   RefreshCw,
   Lock,
   Unlock,
-  AlertTriangle,
   X,
 } from 'lucide-react'
 import { apiRequest } from '../lib/api'
@@ -20,6 +19,9 @@ import { formatCurrency, formatDate } from '../lib/utils'
 import { UserAvatar } from '../components/common/UserAvatar'
 import { DateRangePicker } from '../components/common/DateRangePicker'
 import { TelegramIcon } from '../components/common/TelegramIcon'
+import { ConfirmModal } from '../components/common/ConfirmModal'
+import { TableRowsSkeleton } from '../components/common/Skeleton'
+import { useToast } from '../context/ToastContext'
 
 export const UsersPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -38,10 +40,12 @@ export const UsersPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Block modal state
+  // Block / Unblock modal state
   const [blockingUser, setBlockingUser] = useState<AdminUserListItem | null>(null)
+  const [unblockingUser, setUnblockingUser] = useState<AdminUserListItem | null>(null)
   const [blockReason, setBlockReason] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
+  const toast = useToast()
 
   const fetchUsers = async () => {
     setLoading(true)
@@ -105,28 +109,33 @@ export const UsersPage: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({ reason: blockReason.trim() || 'Qoidabuzarlik sababli' }),
       })
+      toast.success('Foydalanuvchi bloklandi', `${blockingUser.full_name || blockingUser.email} tizimdan chetlatildi.`)
       setBlockingUser(null)
       setBlockReason('')
       fetchUsers()
     } catch (err: any) {
-      alert(err?.message || "Foydalanuvchini bloklashda xatolik")
+      toast.error('Xatolik', err?.message || 'Foydalanuvchini bloklashda xatolik')
     } finally {
       setActionLoading(false)
     }
   }
 
-  const handleUnblockUser = async (user: AdminUserListItem) => {
-    if (!confirm(`Haqiqatan ham ${user.full_name || user.email} akkauntini blokdan chiqarmoqchimisiz?`)) {
-      return
-    }
+  const handleUnblockUser = (user: AdminUserListItem) => {
+    setUnblockingUser(user)
+  }
+
+  const confirmUnblockUser = async () => {
+    if (!unblockingUser) return
     setActionLoading(true)
     try {
-      await apiRequest(`/admin/users/${user.id}/unblock`, {
+      await apiRequest(`/admin/users/${unblockingUser.id}/unblock`, {
         method: 'POST',
       })
+      toast.success('Blokdan chiqarildi', `${unblockingUser.full_name || unblockingUser.email} akkaunti faollashtirildi.`)
+      setUnblockingUser(null)
       fetchUsers()
     } catch (err: any) {
-      alert(err?.message || "Blokdan chiqarishda xatolik")
+      toast.error('Xatolik', err?.message || 'Blokdan chiqarishda xatolik')
     } finally {
       setActionLoading(false)
     }
@@ -268,14 +277,7 @@ export const UsersPage: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-dark-border/60">
               {loading ? (
-                <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <div className="h-7 w-7 animate-spin rounded-full border-2 border-finora-500 border-t-transparent" />
-                      <span>Yuklanmoqda...</span>
-                    </div>
-                  </td>
-                </tr>
+                <TableRowsSkeleton rows={8} cols={8} />
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-5 py-12 text-center text-slate-400">
@@ -472,56 +474,44 @@ export const UsersPage: React.FC = () => {
       </div>
 
       {/* Block User Modal */}
-      {blockingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-dark-border dark:bg-dark-card">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
-                <AlertTriangle className="h-4 w-4" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Bloklash
-                </h3>
-                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                  {blockingUser.full_name || blockingUser.email}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-3.5">
-              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                Sabab:
-              </label>
-              <textarea
-                value={blockReason}
-                onChange={e => setBlockReason(e.target.value)}
-                placeholder="Bloklash sababi..."
-                rows={2}
-                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/50 p-2.5 text-xs text-slate-900 outline-none focus:border-rose-500 focus:bg-white focus:ring-2 focus:ring-rose-500/20 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white resize-none"
-              />
-            </div>
-
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setBlockingUser(null)}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:border-dark-border dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                Bekor qilish
-              </button>
-              <button
-                type="button"
-                disabled={actionLoading}
-                onClick={handleBlockUser}
-                className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
-              >
-                {actionLoading ? 'Saqlanmoqda...' : 'Bloklash'}
-              </button>
-            </div>
-          </div>
+      <ConfirmModal
+        open={Boolean(blockingUser)}
+        title="Foydalanuvchini bloklash"
+        description={`${blockingUser?.full_name || blockingUser?.email || ''} akkauntini vaqtincha bloklashni tasdiqlaysizmi?`}
+        confirmLabel="Bloklash"
+        variant="danger"
+        loading={actionLoading}
+        onConfirm={handleBlockUser}
+        onCancel={() => {
+          setBlockingUser(null)
+          setBlockReason('')
+        }}
+      >
+        <div>
+          <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+            Sabab:
+          </label>
+          <textarea
+            value={blockReason}
+            onChange={e => setBlockReason(e.target.value)}
+            placeholder="Bloklash sababini kiriting..."
+            rows={2}
+            className="mt-1 w-full resize-none rounded-xl border border-slate-300 bg-slate-50/50 p-2.5 text-xs text-slate-900 outline-none focus:border-rose-500 focus:bg-white focus:ring-2 focus:ring-rose-500/20 dark:border-dark-border dark:bg-dark-cardSecondary dark:text-white"
+          />
         </div>
-      )}
+      </ConfirmModal>
+
+      {/* Unblock User Modal */}
+      <ConfirmModal
+        open={Boolean(unblockingUser)}
+        title="Blokdan chiqarish"
+        description={`Haqiqatan ham ${unblockingUser?.full_name || unblockingUser?.email || ''} akkauntini blokdan chiqarmoqchimisiz?`}
+        confirmLabel="Blokdan chiqarish"
+        variant="info"
+        loading={actionLoading}
+        onConfirm={confirmUnblockUser}
+        onCancel={() => setUnblockingUser(null)}
+      />
     </div>
   )
 }

@@ -18,6 +18,8 @@ import type {
   DeletionsAnalyticsData,
 } from '../types'
 import { formatCurrency, formatDate } from '../lib/utils'
+import { ConfirmModal } from '../components/common/ConfirmModal'
+import { useToast } from '../context/ToastContext'
 
 export const AnalyticsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'categories' | 'devices' | 'deletions'>('categories')
@@ -28,6 +30,10 @@ export const AnalyticsPage: React.FC = () => {
   const [categoriesData, setCategoriesData] = useState<CategoriesAnalyticsData | null>(null)
   const [devicesData, setDevicesData] = useState<DevicesAnalyticsData | null>(null)
   const [deletionsData, setDeletionsData] = useState<DeletionsAnalyticsData | null>(null)
+  const [confirmClearAll, setConfirmClearAll] = useState(false)
+  const [deletingRecordId, setDeletingRecordId] = useState<number | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const toast = useToast()
 
   const fetchAnalytics = async () => {
     setLoading(true)
@@ -59,31 +65,48 @@ export const AnalyticsPage: React.FC = () => {
     fetchAnalytics()
   }, [])
 
-  const handleClearDeletions = async () => {
-    if (!confirm("Barcha hisob o'chirish qaydlarini tozalashni tasdiqlaysizmi?")) return
+  const handleClearDeletions = () => {
+    setConfirmClearAll(true)
+  }
+
+  const confirmClearAllDeletions = async () => {
+    setDeleteLoading(true)
     try {
       await apiRequest('/admin/analytics/deletions', { method: 'DELETE' })
       setDeletionsData(prev => (prev ? { ...prev, recent_deletions: [], total_deleted: 0 } : null))
+      toast.success('Tozalandi', "Barcha hisob o'chirish qaydlari tozalandi.")
+      setConfirmClearAll(false)
     } catch (err: any) {
-      alert(err?.message || "O'chirishda xatolik")
+      toast.error('Xatolik', err?.message || "O'chirishda xatolik")
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
-  const handleDeleteSingleDeletion = async (id: number) => {
-    if (!confirm("Ushbu qaydni o'chirishni tasdiqlaysizmi?")) return
+  const handleDeleteSingleDeletion = (id: number) => {
+    setDeletingRecordId(id)
+  }
+
+  const confirmDeleteSingleDeletion = async () => {
+    if (deletingRecordId === null) return
+    setDeleteLoading(true)
     try {
-      await apiRequest(`/admin/analytics/deletions/${id}`, { method: 'DELETE' })
+      await apiRequest(`/admin/analytics/deletions/${deletingRecordId}`, { method: 'DELETE' })
       setDeletionsData(prev =>
         prev
           ? {
               ...prev,
-              recent_deletions: prev.recent_deletions.filter(d => d.id !== id),
+              recent_deletions: prev.recent_deletions.filter(d => d.id !== deletingRecordId),
               total_deleted: Math.max(0, prev.total_deleted - 1),
             }
           : null
       )
+      toast.success("O'chirildi", 'Tanlangan qayd muvaffaqiyatli o‘chirildi.')
+      setDeletingRecordId(null)
     } catch (err: any) {
-      alert(err?.message || "Qaydni o'chirishda xatolik")
+      toast.error('Xatolik', err?.message || "Qaydni o'chirishda xatolik")
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -507,6 +530,28 @@ export const AnalyticsPage: React.FC = () => {
           )}
         </>
       )}
+
+      <ConfirmModal
+        open={confirmClearAll}
+        title="Barcha qaydlarni tozalash"
+        description="Barcha hisob o'chirish qaydlarini butunlay tozalashni tasdiqlaysizmi? Bu amalni ortga qaytarib bo'lmaydi."
+        confirmLabel="Tozalash"
+        variant="danger"
+        loading={deleteLoading}
+        onConfirm={confirmClearAllDeletions}
+        onCancel={() => setConfirmClearAll(false)}
+      />
+
+      <ConfirmModal
+        open={deletingRecordId !== null}
+        title="Qaydni o'chirish"
+        description="Ushbu hisob o'chirish qaydini ro'yxatdan olib tashlashni tasdiqlaysizmi?"
+        confirmLabel="O'chirish"
+        variant="danger"
+        loading={deleteLoading}
+        onConfirm={confirmDeleteSingleDeletion}
+        onCancel={() => setDeletingRecordId(null)}
+      />
     </div>
   )
 }

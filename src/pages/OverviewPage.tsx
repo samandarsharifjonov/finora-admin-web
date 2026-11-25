@@ -22,6 +22,7 @@ import type {
   AdminUserListResponse,
 } from '../types'
 import { formatCompactCurrency } from '../lib/utils'
+import { KpiCardSkeleton, ChartCardSkeleton } from '../components/common/Skeleton'
 import {
   SparklineChart,
   GroupedBarChart,
@@ -100,12 +101,29 @@ export const OverviewPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[460px] items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-finora-500 border-t-transparent" />
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-            Boshqaruv paneli yuklanmoqda...
-          </span>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-56 animate-pulse rounded-xl bg-slate-200/80 dark:bg-dark-cardSecondary/80" />
+            <div className="h-4 w-80 animate-pulse rounded-lg bg-slate-200/70 dark:bg-dark-cardSecondary/70" />
+          </div>
+          <div className="h-9 w-52 animate-pulse rounded-xl bg-slate-200/80 dark:bg-dark-cardSecondary/80" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <KpiCardSkeleton key={i} />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <ChartCardSkeleton />
+          </div>
+          <div className="lg:col-span-4">
+            <ChartCardSkeleton />
+          </div>
+          <div className="lg:col-span-3">
+            <ChartCardSkeleton />
+          </div>
         </div>
       </div>
     )
@@ -382,9 +400,9 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       {/* 2. Top KPI Cards Row (5 cards with Sparklines) */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
         {/* Card 1: Gross Volume */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-dark-border dark:bg-dark-card">
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-dark-border dark:bg-dark-card">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               Yalpi Aylanma (Hajm)
@@ -395,7 +413,7 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="text-2xl font-black tracking-tight tabular-nums text-slate-900 dark:text-white">
                 {formatCompactCurrency(totalGross)}
               </div>
               <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
@@ -426,7 +444,7 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="text-2xl font-black tracking-tight tabular-nums text-slate-900 dark:text-white">
                 {totalUsers.toLocaleString()}
               </div>
               <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
@@ -453,7 +471,7 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="text-2xl font-black tracking-tight tabular-nums text-slate-900 dark:text-white">
                 {totalTelegramUsers.toLocaleString()}
                 <span className="text-xs font-normal text-slate-400 ml-1.5">ta</span>
               </div>
@@ -487,7 +505,7 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="text-2xl font-black tracking-tight tabular-nums text-slate-900 dark:text-white">
                 {dau.toLocaleString()}
                 <span className="text-xs font-semibold text-slate-400 ml-1.5 font-normal">
                   / {mau} oyda
@@ -517,7 +535,7 @@ export const OverviewPage: React.FC = () => {
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="text-2xl font-black tracking-tight tabular-nums text-slate-900 dark:text-white">
                 {totalReceipts.toLocaleString()}
                 <span className="text-xs text-slate-400 ml-1 font-normal">cheklar</span>
               </div>

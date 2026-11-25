@@ -20,6 +20,7 @@ import {
 import type { AdminReceiptDetail } from '../types'
 import { fetchAdminReceipts, fetchAdminReceiptDetail } from '../lib/receiptsApi'
 import { UserAvatar } from '../components/common/UserAvatar'
+import { TableRowsSkeleton } from '../components/common/Skeleton'
 import { formatCurrency, formatDate } from '../lib/utils'
 
 export const ReceiptsPage: React.FC = () => {
@@ -136,7 +137,7 @@ export const ReceiptsPage: React.FC = () => {
               <Receipt className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2.5 text-2xl font-black text-slate-900 dark:text-white">
+          <div className="mt-2.5 text-2xl font-black tabular-nums text-slate-900 dark:text-white">
             {total.toLocaleString()}
           </div>
           <span className="text-[11px] font-medium text-slate-400">Soliq bazasidagi cheklar</span>
@@ -150,7 +151,7 @@ export const ReceiptsPage: React.FC = () => {
               <CreditCard className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2.5 text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <div className="mt-2.5 text-2xl font-black tabular-nums text-emerald-600 dark:text-emerald-400">
             {formatCurrency(totalAmount)}
           </div>
           <span className="text-[11px] font-medium text-slate-400">{receipts.length} ta chek summasi</span>
@@ -164,7 +165,7 @@ export const ReceiptsPage: React.FC = () => {
               <Banknote className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2.5 text-2xl font-black text-slate-900 dark:text-white">
+          <div className="mt-2.5 text-2xl font-black tabular-nums text-slate-900 dark:text-white">
             {formatCurrency(averageAmount)}
           </div>
           <span className="text-[11px] font-medium text-slate-400">Har bitta xarid uchun</span>
@@ -178,7 +179,7 @@ export const ReceiptsPage: React.FC = () => {
               <ShoppingBag className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-2.5 text-2xl font-black text-slate-900 dark:text-white">
+          <div className="mt-2.5 text-2xl font-black tabular-nums text-slate-900 dark:text-white">
             {totalItems.toLocaleString()}
           </div>
           <span className="text-[11px] font-medium text-slate-400">Xarid qilingan mahsulotlar</span>
@@ -242,9 +243,12 @@ export const ReceiptsPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="h-7 w-7 animate-spin rounded-full border-2 border-finora-500 border-t-transparent" />
-            <p className="mt-2.5 text-xs text-slate-400">Cheklar yuklanmoqda...</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <tbody className="divide-y divide-slate-100 dark:divide-dark-border/60">
+                <TableRowsSkeleton rows={6} cols={7} />
+              </tbody>
+            </table>
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
