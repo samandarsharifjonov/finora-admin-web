@@ -166,9 +166,9 @@ export const BroadcastPage: React.FC = () => {
       await apiRequest('/admin/notifications/broadcast', { method: 'DELETE' })
       setBroadcasts([])
       setConfirmClearAll(false)
-      toast.success('Tozalandi', 'Xabarnomalar tarixi tozalandi.')
+      toast.success('Tozalandi', 'Barcha xabarnomalar bazadan va qurilmalardan o‘chirildi.')
     } catch (err: any) {
-      toast.error('Xatolik', err?.message || 'Tarixni tozalashda xatolik')
+      toast.error('Xatolik', err?.message || 'Tozalashda xatolik')
     } finally {
       setModalLoading(false)
     }
@@ -193,9 +193,11 @@ export const BroadcastPage: React.FC = () => {
     if (deleteTargetId === null) return
     setModalLoading(true)
     try {
-      await apiRequest(`/admin/notifications/broadcast/${deleteTargetId}`, { method: 'DELETE' })
+      await apiRequest(`/admin/notifications/broadcast/${deleteTargetId}?delete_in_app=true`, {
+        method: 'DELETE',
+      })
       setDeleteTargetId(null)
-      toast.success("O'chirildi", "Xabarnoma tarixdan o'chirildi.")
+      toast.success("O'chirildi", 'Yangilik bazadan va barcha qurilmalardan o‘chirildi.')
       fetchBroadcasts()
     } catch (err: any) {
       toast.error('Xatolik', err?.message || "O'chirishda xatolik")
@@ -558,9 +560,9 @@ export const BroadcastPage: React.FC = () => {
       {/* Confirm Modals */}
       <ConfirmModal
         open={confirmClearAll}
-        title="Tarixni tozalash"
-        description="Barcha xabarnomalar tarixini butunlay tozalashni tasdiqlaysizmi?"
-        confirmLabel="Tozalash"
+        title="Barchasini o‘chirish"
+        description="Barcha xabarnoma va yangiliklar bazadan hamda barcha qurilmalardan butunlay o‘chiriladi."
+        confirmLabel="Barchasini o‘chirish"
         variant="danger"
         loading={modalLoading}
         onConfirm={confirmClearHistory}
@@ -580,8 +582,8 @@ export const BroadcastPage: React.FC = () => {
 
       <ConfirmModal
         open={deleteTargetId !== null}
-        title="Xabarnomani o‘chirish"
-        description="Ushbu xabarnomani tarixdan o‘chirishni tasdiqlaysizmi?"
+        title="Yangilikni bazadan o‘chirish"
+        description="Ushbu yangilik bazadan va barcha foydalanuvchilar qurilmasidan butunlay o‘chiriladi."
         confirmLabel="O‘chirish"
         variant="danger"
         loading={modalLoading}
